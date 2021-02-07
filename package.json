@@ -1,0 +1,24 @@
+{
+  "name": "atree",
+  "version": "1.0.0",
+  "description": "Node.js mxgraph Attack Tree Teaching Tool",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/James-Wickenden/nodejs_atree.git"
+  },
+  "author": "James Wickenden",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/James-Wickenden/nodejs_atree/issues"
+  },
+  "homepage": "https://github.com/James-Wickenden/nodejs_atree#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mxgraph": "^4.2.2"
+  }
+}
