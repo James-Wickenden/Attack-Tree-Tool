@@ -6,6 +6,6 @@ express()
   .use(express.static(path.join(__dirname, 'public')))
   .get('/', (req, res) => {
     console.log("Loading main...")
-    res.sendFile(path.join(__dirname, 'public/tree.html'))
+    res.sendFile(path.join(__dirname, 'public/old.html'))
   })
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
