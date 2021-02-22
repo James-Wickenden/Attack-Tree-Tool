@@ -6,7 +6,7 @@ express()
   .use(express.static(path.join(__dirname, 'public')))
   .get('/', (req, res) => {
     console.log("Loading main...")
-    res.sendFile(path.join(__dirname, 'public/old.html'))
+    res.sendFile(path.join(__dirname, 'public/main.html'))
   })
   .get('/tree', (req, res) => {
     console.log("Loading tree...")
