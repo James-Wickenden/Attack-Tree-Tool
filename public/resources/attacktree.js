@@ -1,14 +1,5 @@
 "use strict";
 
-function instantiateTree(goal) {
-    const atree = {};
-    atree.nodes = [];
+const atree = {};
 
-}
-
-function addNode() {
-    const node = {};
-    node.goal = "Something";
-    node.attributes = [];
-    node.parent = -1;
-}
+console.log(atree);

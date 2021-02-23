@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-GB" xml:lang="en-GB">
+
+	<head>
+		<meta charset="UTF-8"/>
+		<title>Attack Tree Modelling</title>
+
+        <script type= "text/javascript">
+            mxBasePath = 'mxgraph';
+        </script>
+        <script type= "text/javascript" src='mxgraph/js/mxClient.js'></script>
+        <script type= "text/javascript">
+            function main(container) {
+                if (!mxClient.isBrowserSupported()) {
+                    mxUtils.error('Broswer not supported')
+                }
+                else {
+                    var graph = new mxGraph(container);
+
+                    new mxRubberband(graph);
+
+                    var parent = graph.getDefaultParent();
+
+                    graph.getModel().beginUpdate();
+                    try {
+                        var v1 = graph.insertVertex(parent, null, "Hello", 20, 20, 80, 30);
+                        var v2 = graph.insertVertex(parent, null, "World", 200, 20, 80, 30);
+
+                        var e1 = graph.insertEdge(parent, null, "", v1, v2)
+                    }
+                    finally {
+                        graph.getModel().endUpdate();
+                    }
+                }
+            };
+        </script>
+	</head>
+
+	<body onload="main(document.getElementById('graphContainer'))">
+		<h1>Version 1: Adjustable windows</h1>
+        <div id='graphContainer' style='overflow:hidden; width:300px; height:300px;'></div>
+	</body>
+</html>

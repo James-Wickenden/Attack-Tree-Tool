@@ -28,4 +28,8 @@ express()
     console.log("Loading graph editor B...")
     res.sendFile(path.join(__dirname, 'public/editor2.html'))
   })
+  .get('/atree_test', (req, res) => {
+    console.log("Loading attack tree model...")
+    res.sendFile(path.join(__dirname, 'public/atree_test.html'))
+  })
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
