@@ -21,12 +21,20 @@
 
                     var parent = graph.getDefaultParent();
 
+                    var layout = new mxHierarchicalLayout(graph);
+
                     graph.getModel().beginUpdate();
                     try {
-                        var v1 = graph.insertVertex(parent, null, "Hello", 20, 20, 80, 30);
-                        var v2 = graph.insertVertex(parent, null, "World", 200, 20, 80, 30);
+                        var doc = mxUtils.parseXml("");
+                        var decoder = mxCodec(doc);
+                        var node = doc.documentElement;
+                        decoder.decode(node, graph.getModel());
 
-                        var e1 = graph.insertEdge(parent, null, "", v1, v2)
+                        layout.execute(parent);
+                        //var v1 = graph.insertVertex(parent, null, "Hello", 20, 20, 80, 30);
+                        //var v2 = graph.insertVertex(parent, null, "World", 200, 20, 80, 30);
+
+                        //var e1 = graph.insertEdge(parent, null, "", v1, v2)
                     }
                     finally {
                         graph.getModel().endUpdate();
