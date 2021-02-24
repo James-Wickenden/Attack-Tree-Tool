@@ -10,11 +10,11 @@
 
 	<!-- Sets the basepath for the library if not in same directory -->
 	<script type="text/javascript">
-		mxBasePath = '../mxgraph';
+		mxBasePath = 'resources/scripts/mxgraph';
 	</script>
 
 	<!-- Loads and initializes the library -->
-	<script type="text/javascript" src="../mxgraph/js/mxClient.js"></script>
+	<script type= "text/javascript" src='resources/scripts/mxgraph/js/mxClient.js'></script>
 
 	<!-- Example code -->
 	<script type="text/javascript">
@@ -34,7 +34,7 @@
 			{
 				// Defines an icon for creating new connections in the connection handler.
 				// This will automatically disable the highlighting of the source vertex.
-				mxConnectionHandler.prototype.connectImage = new mxImage('images/connector.gif', 16, 16);
+				mxConnectionHandler.prototype.connectImage = new mxImage('resources/img/mxgraph_images/connector.gif', 16, 16);
 
 				// Creates the div for the toolbar
 				var tbContainer = document.createElement('div');
@@ -60,7 +60,7 @@
 				container.style.top = '0px';
 				container.style.right = '0px';
 				container.style.bottom = '0px';
-				container.style.background = 'url("editors/images/grid.gif")';
+				container.style.background = 'url("resources/scripts/editors/images/grid.gif")';
 
 				document.body.appendChild(container);
 				
@@ -101,13 +101,13 @@
 					});
 				};
 				
-				addVertex('editors/images/rectangle.gif', 100, 40, '');
-				addVertex('editors/images/rounded.gif', 100, 40, 'shape=rounded');
-				addVertex('editors/images/ellipse.gif', 40, 40, 'shape=ellipse');
-				addVertex('editors/images/rhombus.gif', 40, 40, 'shape=rhombus');
-				addVertex('editors/images/triangle.gif', 40, 40, 'shape=triangle');
-				addVertex('editors/images/cylinder.gif', 40, 40, 'shape=cylinder');
-				addVertex('editors/images/actor.gif', 30, 40, 'shape=actor');
+				addVertex('resources/scripts/editors/images/rectangle.gif', 100, 40, '');
+				addVertex('resources/scripts/editors/images/rounded.gif', 100, 40, 'shape=rounded');
+				addVertex('resources/scripts/editors/images/ellipse.gif', 40, 40, 'shape=ellipse');
+				addVertex('resources/scripts/editors/images/rhombus.gif', 40, 40, 'shape=rhombus');
+				addVertex('resources/scripts/editors/images/triangle.gif', 40, 40, 'shape=triangle');
+				addVertex('resources/scripts/editors/images/cylinder.gif', 40, 40, 'shape=cylinder');
+				addVertex('resources/scripts/editors/images/actor.gif', 30, 40, 'shape=actor');
 			}
 		}
 
