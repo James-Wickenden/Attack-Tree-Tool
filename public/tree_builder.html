@@ -29,7 +29,8 @@
 				graph.panningHandler.useLeftButtonForPanning = true; // Pans by holding left mouse
                 graph.setTooltips(!mxClient.IS_TOUCH);               // Disables tooltips on touch devices
 
-                // When editing a cell, ensure a minimum size for legibility
+                // When editing a cell, ensures a minimum size for legibility
+                // by overriding the getPreferredSizeForCell function
 				var oldGetPreferredSizeForCell = graph.getPreferredSizeForCell;
 				graph.getPreferredSizeForCell = function(cell) {
 					var result = oldGetPreferredSizeForCell.apply(this, arguments);
@@ -37,7 +38,6 @@
 						result.width = Math.max(120, result.width - 40);
                         result.height = Math.max(60, result.height - 40);
 					}
-                    
 					return result;
 				};
 
@@ -127,35 +127,25 @@
         // Create a new leaf node with cell as its parent node
         function AddChild(graph, cell) {
             var parent = graph.getDefaultParent();
-            var newnode;
 
-            // TODO: rewrite this and getPreferredSizeForCell overwrite for better understanding!
             graph.getModel().beginUpdate();
             try {
-                newnode = graph.insertVertex(parent, null, '');
+                var newnode = graph.insertVertex(parent, null, '');
                 var geometry = graph.getModel().getGeometry(newnode);
 
                 // Updates the geometry of the vertex with the preferred size computed in the graph
                 var size = graph.getPreferredSizeForCell(newnode);
                 geometry.width = size.width;
                 geometry.height = size.height;
-
+                
                 // Adds the edge between the existing cell and the new vertex
                 var edge = graph.insertEdge(parent, null, '', cell, newnode);
-
-                // Configures the edge label "in-place" to reside
-                // at the end of the edge (x = 1) and with an offset
-                // of 20 pixels in negative, vertical direction.
-                //edge.geometry.x = 1;
-                //edge.geometry.y = 0;
-                //edge.geometry.offset = new mxPoint(0, -20);
 
                 AddOverlays(graph, newnode, false);
             }
             finally {
                 graph.getModel().endUpdate();
             }
-            return newnode;
         };
 
         // Delete the subtree with cell as its root
