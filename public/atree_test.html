@@ -12,7 +12,7 @@
         <script type= "text/javascript">
             function main(container) {
                 if (!mxClient.isBrowserSupported()) {
-                    mxUtils.error('Broswer not supported')
+                    mxUtils.error('Broswer not supported', 200, false)
                 }
                 else {
                     var graph = new mxGraph(container);
@@ -25,27 +25,34 @@
 
                     graph.getModel().beginUpdate();
                     try {
-                        var doc = mxUtils.parseXml("");
-                        var decoder = mxCodec(doc);
-                        var node = doc.documentElement;
-                        decoder.decode(node, graph.getModel());
+                        graph.addListener(mxEvent.CLICK, function(sender, evt) {
+                            var cell = evt.getProperty('cell');
+                            console.log(cell.value);
+                            console.log(sender.toString());
+                        });
+                        var v1 = graph.insertVertex(parent, null, "Hello", 20, 20, 80, 30);
+                        var v2 = graph.insertVertex(parent, null, "World", 200, 20, 80, 30);
 
-                        layout.execute(parent);
-                        //var v1 = graph.insertVertex(parent, null, "Hello", 20, 20, 80, 30);
-                        //var v2 = graph.insertVertex(parent, null, "World", 200, 20, 80, 30);
-
-                        //var e1 = graph.insertEdge(parent, null, "", v1, v2)
+                        var e1 = graph.insertEdge(parent, null, "", v1, v2)
                     }
                     finally {
                         graph.getModel().endUpdate();
                     }
                 }
             };
+
+            function read(graph, filename) {
+                var req = mxUtils.load(filename);
+                var root = req.getDocumentElement();
+                var dec = new mxCodec(root.ownerDocument);
+
+                dec.decode(root, graph.getModel());
+            }
         </script>
 	</head>
 
 	<body onload="main(document.getElementById('graphContainer'))">
 		<h1>Version 1: Adjustable windows</h1>
-        <div id='graphContainer' style='overflow:hidden; width:300px; height:300px;'></div>
+        <div id='graphContainer' style='overflow:hidden; width:800px; height:800px; border:1px solid black'></div>
 	</body>
 </html>
