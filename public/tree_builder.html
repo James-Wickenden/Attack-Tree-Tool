@@ -18,12 +18,68 @@
             }
             else {
                 var graph = new mxGraph(container);
+
+				graph.setCellsMovable(false);                        // Disabled dragging to move cells around
+				graph.setAutoSizeCells(true);                        // Resizes cells after changing labels automatically
+				graph.setPanning(true);                              // Enables panning
+				graph.centerZoom = false;                            // Sets to zoom from the top left, not the center
+				graph.panningHandler.useLeftButtonForPanning = true; // Pans by holding left mouse
+                graph.setTooltips(!mxClient.IS_TOUCH);               // Disables tooltips on touch devices
+
+                // Stops editing on enter or escape keypress
+				var keyHandler = new mxKeyHandler(graph);
+
+                // Enables automatic layout on the graph and installs
+				// a tree layout for all groups who's children are
+				// being changed, added or removed.
+				var layout = new mxCompactTreeLayout(graph, false);
+				layout.useBoundingBox = false;
+				layout.edgeRouting = false;
+				layout.levelDistance = 60;
+				layout.nodeDistance = 16;
+
+                // Allows the layout to move cells even though cells aren't movable in the graph
+				layout.isVertexMovable = function(cell) { return true; };
+
+                // Gets the default parent for inserting new cells.
+                var parent = graph.getDefaultParent();
                 
+                // Adds the root vertex of the tree
+				graph.getModel().beginUpdate();
+				try
+				{
+                    var w = graph.container.offsetWidth;
+                    var root = graph.insertVertex(parent, 'root', "Root goal", (w/2)-30, 20, 140, 60);
+					//var v1 = graph.insertVertex(parent, 'treeRoot',
+					//	'Organization', w/2 - 30, 20, 140, 60, 'image=resources/scripts/editors/images/house.png');
+					//graph.updateCellSize(root);
+					//addOverlays(graph, v1, false);
+				}
+				finally
+				{
+					// Updates the display
+					graph.getModel().endUpdate();
+				}
+                
+                //AddToolbar(container, graph);
             }
-        }
+        };
+
+        function AddToolbar(container, graph) {
+            var toolbarContainer = document.createElement('div');
+
+            container.appendChild(toolbarContainer);
+            var tb = new mxToolbar(toolbarContainer);
+            
+			tb.addItem('Zoom In', 'resources/img/mxgraph_images/zoom_in32.png',function(evt) { graph.zoomIn(); });
+            tb.addItem('Zoom Out', 'resources/img/mxgraph_images/zoom_out32.png',function(evt) { graph.zoomOut(); });
+			
+            wnd = new mxWindow('Tools', toolbarContainer, 0, 0, 200, 66, false);
+            wnd.setVisible(true);
+        };
     </script>
 </head>
-<body onload='main();'>
+<body onload="main(document.getElementById('graphContainer'));">
     <h1>Tree builder</h1>
     <div id='graphContainer'></div>
 </body>

@@ -157,7 +157,7 @@
 				};
 
 				var layoutMgr = new mxLayoutManager(graph);
-
+				
 				layoutMgr.getLayout = function(cell)
 				{
 					if (cell.getChildCount() > 0)
@@ -165,13 +165,13 @@
 						return layout;
 					}
 				};
-
+				
 				// Installs a popupmenu handler using local function (see below).
 				graph.popupMenuHandler.factoryMethod = function(menu, cell, evt)
 				{
 					return createPopupMenu(graph, menu, cell, evt);
 				};
-
+				
 				// Fix for wrong preferred size
 				var oldGetPreferredSizeForCell = graph.getPreferredSizeForCell;
 				graph.getPreferredSizeForCell = function(cell)
