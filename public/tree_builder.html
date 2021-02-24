@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-GB" xml:lang="en-GB">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Tree builder</title>
+  
+    <link rel="stylesheet" type="text/css" href="resources/css/global_style.css"/>
+
+    <!-- Loads and initialises mxgraph and its basepath -->
+    <script type="text/javascript"> mxBasePath = 'resources/scripts/mxgraph'; </script>
+    <script type= "text/javascript" src='resources/scripts/mxgraph/js/mxClient.js'></script>
+
+    <script type="text/javascript">
+        function main(container) {
+            // Checks if browser is supported, throws an error if not.
+            if (!mxClient.isBrowserSupported()) {
+                mxUtils.error('Broswer not supported', 200, false)
+            }
+            else {
+                var graph = new mxGraph(container);
+                
+            }
+        }
+    </script>
+</head>
+<body onload='main();'>
+    <h1>Tree builder</h1>
+    <div id='graphContainer'></div>
+</body>
+</html>
