@@ -8,17 +8,17 @@ express()
     console.log("Loading main...")
     res.sendFile(path.join(__dirname, 'public/main.html'))
   })
-  .get('/tree', (req, res) => {
-    console.log("Loading tree...")
-    res.sendFile(path.join(__dirname, 'public/tree.html'))
+  .get('/mxgraph_test_1', (req, res) => {
+    console.log("Loading test mxgraph model 1...")
+    res.sendFile(path.join(__dirname, 'public/mxgraph_test_1.html'))
   })
-  .get('/version1', (req, res) => {
-    console.log("Loading UI Version 1: Adjustable windows...")
-    res.sendFile(path.join(__dirname, 'public/version1.html'))
+  .get('/mxgraph_test_2', (req, res) => {
+    console.log("Loading test mxgraph model 2...")
+    res.sendFile(path.join(__dirname, 'public/mxgraph_test_2.html'))
   })
-  .get('/version2', (req, res) => {
-    console.log("Loading UI Version 2: Separate tabs...")
-    res.sendFile(path.join(__dirname, 'public/version2.html'))
+  .get('/versions', (req, res) => {
+    console.log("Loading UI versions...")
+    res.sendFile(path.join(__dirname, 'public/versions.html'))
   })
   .get('/editor1', (req, res) => {
     console.log("Loading graph editor A...")
@@ -27,9 +27,5 @@ express()
   .get('/editor2', (req, res) => {
     console.log("Loading graph editor B...")
     res.sendFile(path.join(__dirname, 'public/editor2.html'))
-  })
-  .get('/atree_test', (req, res) => {
-    console.log("Loading attack tree model...")
-    res.sendFile(path.join(__dirname, 'public/atree_test.html'))
   })
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
