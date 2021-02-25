@@ -4,6 +4,7 @@ tree changes:
     toolbar at top
     styling
     deselect node editing on enter
+    fix cell resizing
 
 attack tree logic:
     storing variable attributes in nodes

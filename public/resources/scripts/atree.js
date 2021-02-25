@@ -1,3 +1,5 @@
+var doc;
+
 function main(container) {
     // Checks if browser is supported, throws an error if not.
     if (!mxClient.isBrowserSupported()) {
@@ -5,6 +7,7 @@ function main(container) {
     }
     else {
         var graph = new mxGraph(container);
+        doc = mxUtils.createXmlDocument();
 
         // Prevents the right clicking menu
         mxEvent.disableContextMenu(container);
@@ -28,6 +31,36 @@ function main(container) {
             return result;
         };
 
+        // Renders the label attribute on nodes
+        // This is done as attack tree nodes are XML structures instead of simple mxcells
+        graph.convertValueToString = function(cell) {
+                if (mxUtils.isNode(cell.value)) {
+                    return cell.getAttribute('label');
+                }
+            };
+
+        // Updates the node label when changed
+        // Similarly done due to using XML cell structures
+        // Code from https://jgraph.github.io/mxgraph/docs/js-api/files/model/mxCell-js.html
+        var cellLabelChanged = graph.cellLabelChanged;
+        graph.cellLabelChanged = function(cell, newValue, autoSize) {
+                if (mxUtils.isNode(cell.value)) {
+                    // Clones the value for correct undo/redo
+                    var elt = cell.value.cloneNode(true);
+                    elt.setAttribute('label', newValue);
+                    newValue = elt;
+                }
+
+                cellLabelChanged.apply(this, arguments);
+            };
+
+        // Catches resizing; can be extended to enforce minimum size for legibility
+        // but currently does nothing
+        var resizeOld = graph.resizeCell;
+        graph.resizeCell = function(cell, bounds, recurse) {
+            return resizeOld.apply(this, arguments);
+        }
+
         // Enables automatic layout on the graph and installs
         // a tree layout for all groups who's children are
         // being changed, added or removed.
@@ -46,9 +79,8 @@ function main(container) {
             if (cell.getChildCount() > 0) { return layout; }
         };
 
-        // Installs a popupmenu handler using local function (see below).
-        graph.popupMenuHandler.factoryMethod = function(menu, cell, evt)
-        {
+        // Overrides the popupMenuHandler method to the defined context-sensitive one.
+        graph.popupMenuHandler.factoryMethod = function(menu, cell, evt) {
             return CreateContextMenu(graph, menu, cell, evt);
         };
 
@@ -59,7 +91,10 @@ function main(container) {
         graph.getModel().beginUpdate();
         try {
             var w = graph.container.offsetWidth;
-            var root = graph.insertVertex(parent, 'root', "Root goal", (w/2)-30, 20, 140, 60);
+            var rootxml = doc.createElement('cell');
+            rootxml.setAttribute('label', 'Root Goal');
+
+            var root = graph.insertVertex(parent, 'root', rootxml, w / 3, 20, 140, 60);
             graph.updateCellSize(root);
             AddOverlays(graph, root, true);
         }
@@ -148,6 +183,10 @@ function CreateContextMenu(graph, menu, cell, evt) {
     menu.addItem('Zoom out', 'resources/scripts/editors/images/zoomactual.gif', function() {
         graph.zoomActual();
     });
+
+    menu.addItem('Traverse', 'resources/img/mxgraph_images/redo.png', function() {
+        TraverseTree(graph);
+    });
 };
 
 // Create a new leaf node with cell as its parent node
@@ -156,7 +195,10 @@ function AddChild(graph, cell) {
 
     graph.getModel().beginUpdate();
     try {
-        var newnode = graph.insertVertex(parent, null, '');
+        var xmlnode = doc.createElement('cell');
+        xmlnode.setAttribute('label', '');
+
+        var newnode = graph.insertVertex(parent, null, xmlnode);
         var geometry = graph.getModel().getGeometry(newnode);
 
         // Updates the geometry of the vertex with the preferred size computed in the graph
@@ -168,6 +210,7 @@ function AddChild(graph, cell) {
         var edge = graph.insertEdge(parent, null, '', cell, newnode);
 
         AddOverlays(graph, newnode, false);
+        console.log(newnode.getAttribute('label'));
     }
     finally {
         graph.getModel().endUpdate();
@@ -183,4 +226,14 @@ function DeleteSubtree(graph, cell) {
     });
 
     graph.removeCells(cells);
+};
+
+// Performs depth-first traversal from the fixed root goal node
+function TraverseTree(graph) {
+    console.log("Traversing tree...")
+    var root = graph.getModel().getCell('root');
+    graph.traverse(root, true, function(vertex) {
+        //vertex.setAttribute('cost', '0'); // Attack tree attributes can therefore be added and updated as such
+        console.log(vertex.value);
+    });
 };
