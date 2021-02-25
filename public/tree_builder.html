@@ -59,6 +59,12 @@
 					if (cell.getChildCount() > 0) { return layout; }
 				};
 
+                // Installs a popupmenu handler using local function (see below).
+				graph.popupMenuHandler.factoryMethod = function(menu, cell, evt)
+				{
+					return CreateContextMenu(graph, menu, cell, evt);
+				};
+
                 // Gets the default parent for inserting new cells.
                 var parent = graph.getDefaultParent();
                 
@@ -97,6 +103,7 @@
         // Adds buttons to a node with key node functions:
         // creating a new child from that node and deleting nodes and their subtree.
         function AddOverlays(graph, cell, isRoot) {
+            return; // Currently disabled to only use right-click context menu.
             // Draw the button to create a new child for that node
             var overlay_addchild = new mxCellOverlay(new mxImage('resources/img/mxgraph_images/add.png', 24, 24), 'Add Child');
             overlay_addchild.cursor = 'hand';
@@ -122,6 +129,38 @@
             
                 graph.addCellOverlay(cell, overlay_delete);
             }
+        };
+
+        // Creates and handles the right click pop-up context menu
+        // Allows for inserting new child nodes, deleting subtrees, and zooming
+        function CreateContextMenu(graph, menu, cell, evt) {
+            var model = graph.getModel();
+
+            // Context: node right clicked
+            if (cell != null) {
+                if (model.isVertex(cell)) {
+                    menu.addItem('Add child', 'resources/scripts/editors/images/overlays/check.png', function() {
+				            AddChild(graph, cell);
+			            });
+
+                    if (cell.id != 'root') {
+                        menu.addItem('Delete', 'resources/scripts/editors/images/delete.gif', function() {
+                                DeleteSubtree(graph, cell);
+                            });
+                    }
+
+                    menu.addSeparator();
+                }
+            }
+
+            // Context: global
+            menu.addItem('Zoom to fit', 'resources/scripts/editors/images/zoom.gif', function() {
+                graph.fit();
+            });
+
+            menu.addItem('Zoom out', 'resources/scripts/editors/images/zoomactual.gif', function() {
+                graph.zoomActual();
+            });
         };
 
         // Create a new leaf node with cell as its parent node

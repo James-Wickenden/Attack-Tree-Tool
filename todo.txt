@@ -1,0 +1,6 @@
+tree changes:
+    disable moving edges which disconnects nodes from the tree
+    disable highlighting nodes
+    toolbar at top
+    styling
+    
