@@ -3,4 +3,10 @@ tree changes:
     disable highlighting nodes
     toolbar at top
     styling
+    deselect node editing on enter
+
+attack tree logic:
+    storing variable attributes in nodes
+    drawing attributes on the tree
+    handling and creating AND/OR nodes -> add and/or overlay similar to add child overlay button?
     
