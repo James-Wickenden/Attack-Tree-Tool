@@ -9,16 +9,20 @@ function main(container) {
         var graph = new mxGraph(container);
         doc = mxUtils.createXmlDocument();
 
-        // Prevents the right clicking menu
+        // Disables the default right clicking menu
         mxEvent.disableContextMenu(container);
 
         graph.setCellsMovable(false);                        // Disabled dragging to move cells around
-        graph.setAutoSizeCells(true);                      // Resizes cells after changing labels automatically
+        graph.setAutoSizeCells(true);                        // Resizes cells after changing labels automatically
         graph.setPanning(true);                              // Enables panning
         graph.centerZoom = false;                            // Sets to zoom from the top left, not the center
         graph.panningHandler.useLeftButtonForPanning = true; // Pans by holding left mouse
         graph.setTooltips(!mxClient.IS_TOUCH);               // Disables tooltips on touch devices
 
+        // Stops editing on enter or escape keypress
+		var keyHandler = new mxKeyHandler(graph);
+        
+        
         // When editing a cell, ensures a minimum size for legibility
         // by overriding the getPreferredSizeForCell function
         var oldGetPreferredSizeForCell = graph.getPreferredSizeForCell;
@@ -93,6 +97,7 @@ function main(container) {
             var w = graph.container.offsetWidth;
             var rootxml = doc.createElement('cell');
             rootxml.setAttribute('label', 'Root Goal');
+            rootxml.setAttribute('nodetype', 'or');
 
             var root = graph.insertVertex(parent, 'root', rootxml, w / 3, 20, 140, 60);
             graph.updateCellSize(root);
@@ -176,6 +181,7 @@ function CreateContextMenu(graph, menu, cell, evt) {
     }
 
     // Context: global
+    /*
     menu.addItem('Zoom to fit', 'resources/scripts/editors/images/zoom.gif', function() {
         graph.fit();
     });
@@ -183,9 +189,22 @@ function CreateContextMenu(graph, menu, cell, evt) {
     menu.addItem('Zoom out', 'resources/scripts/editors/images/zoomactual.gif', function() {
         graph.zoomActual();
     });
+    */
+
+   menu.addItem('Zoom in', 'resources/img/mxgraph_images/zoom_in.png', function() {
+    graph.zoomIn();
+    });
+
+    menu.addItem('Zoom out', 'resources/img/mxgraph_images/zoom_out.png', function() {
+        graph.zoomOut();
+    });
+
+    menu.addItem('Add attribute', 'resources/img/mxgraph_images/navigate_plus.png', function() {
+        AddAttribute(graph);
+    });
 
     menu.addItem('Traverse', 'resources/img/mxgraph_images/redo.png', function() {
-        TraverseTree(graph);
+        TraverseTree(graph, function(vertex) { console.log(vertex.value); });
     });
 };
 
@@ -197,6 +216,7 @@ function AddChild(graph, cell) {
     try {
         var xmlnode = doc.createElement('cell');
         xmlnode.setAttribute('label', '');
+        xmlnode.setAttribute('nodetype', 'or');
 
         var newnode = graph.insertVertex(parent, null, xmlnode);
         var geometry = graph.getModel().getGeometry(newnode);
@@ -210,7 +230,6 @@ function AddChild(graph, cell) {
         var edge = graph.insertEdge(parent, null, '', cell, newnode);
 
         AddOverlays(graph, newnode, false);
-        console.log(newnode.getAttribute('label'));
     }
     finally {
         graph.getModel().endUpdate();
@@ -229,11 +248,17 @@ function DeleteSubtree(graph, cell) {
 };
 
 // Performs depth-first traversal from the fixed root goal node
-function TraverseTree(graph) {
-    console.log("Traversing tree...")
+function TraverseTree(graph, vertex_function) {
+    console.log("Traversing tree:\n" + vertex_function.toString());
     var root = graph.getModel().getCell('root');
-    graph.traverse(root, true, function(vertex) {
-        //vertex.setAttribute('cost', '0'); // Attack tree attributes can therefore be added and updated as such
-        console.log(vertex.value);
+
+    graph.traverse(root, true, vertex_function);
+    //vertex.setAttribute('cost', '0'); // Attack tree attributes can therefore be added and updated as such
+};
+
+// Modify nodes to have a new attack tree attribute, eg. cost, probability of attack.
+function AddAttribute(graph) {
+    TraverseTree(graph, function(vertex) {
+        vertex.setAttribute('cost', '0');
     });
 };
