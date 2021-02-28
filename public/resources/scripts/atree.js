@@ -191,9 +191,17 @@ function CreateContextMenu(graph, menu, cell, evt) {
                 });
             };
 
-            menu.addItem('Get Children', 'resources/scripts/editors/images/connector.gif', function() {
+            menu.addItem('Get Children', 'resources/img/mxgraph_images/connector.gif', function() {
                 GetChildren(cell);
             });
+
+            // Only show the option to propagate on leaf cells
+            if (cell.getEdgeCount() == 1 && cell.getId() != 'root') {
+                menu.addItem('Propogate up', 'resources/img/mxgraph_images/check.png', function() {
+                    PropagateChangeUpTree(graph, cell, attributes, true);
+                }); 
+            };
+            
 
             menu.addSeparator();
         }
@@ -234,7 +242,7 @@ function AddChild(graph, cell) {
         // the new child will be a leaf by definition, so we can assign default values
         // TODO: set the parent [cell] to no longer render using default values?
         attributes.forEach(function(attr) {
-            xmlnode.setAttribute(attr, '0');
+            xmlnode.setAttribute(attr, 0);
         });
 
         // Updates the geometry of the vertex with the preferred size computed in the graph
@@ -278,7 +286,7 @@ function AddAttribute(graph) {
 
     attributes.push(attributeName);
     TraverseTree(graph, function(vertex) {
-        vertex.setAttribute(attributeName, '0');
+        vertex.setAttribute(attributeName, 0);
     });
     graph.refresh();
 };
@@ -289,18 +297,31 @@ function EditAttribute(graph, cell) {
     var attributeName = 'cost';
     var newValue = prompt("Enter new" + attributeName + "value for cell:", 0);
     cell.setAttribute(attributeName, newValue);
-    PropagateChangeUpTree(graph, cell);
     graph.refresh();
 };
 
 // When an attribute is edited or a child is added or deleted,
 // the change must propagate up the tree to the root (or until a node is unaffected in every attribute)
-function PropagateChangeUpTree(graph, cell, attributesToProgagate=null) {
-    attributes.forEach(function(attr) {
-        console.log(cell.getTerminal(true));
+function PropagateChangeUpTree(graph, cell, attributesToProgagate=attributes, canRefresh=false) {
+    var parent = cell.getTerminal(true);
+    var children = GetChildren(cell);
+
+    attributesToProgagate.forEach(function(attr) {
+        var cumulativeValue = 0;
+        for (i = 0; i < children.length; i++) {
+            cumulativeValue += parseInt(children[i].getAttribute(attr));
+        }
+        cell.setAttribute(attr, cumulativeValue);
     });
-    console.log(attributesToProgagate);
-    graph.refresh();
+
+    if (parent === null) {
+        return;
+    }
+    else {
+        PropagateChangeUpTree(graph, parent, attributesToProgagate);
+    };
+
+    if (canRefresh) graph.refresh();
 };
 
 // Due to the mxCompositeLayout model, nodes must use the default parent
@@ -308,6 +329,7 @@ function PropagateChangeUpTree(graph, cell, attributesToProgagate=null) {
 // The cell parent is stored in the Source attribute (usually reserved for edges)
 // The children must be calculated by iterating through edges,
 // and filtering out the edge pointing at the node.
+// A similar approach could be used as an alternative for finding the parent should using Terminals prove a bad idea.
 function GetChildren(cell) {
     var children = [];
     var noEdges = cell.getEdgeCount();
