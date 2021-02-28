@@ -55,13 +55,14 @@ function main(container) {
 
                 cellLabelChanged.apply(this, arguments);
             };
-
-        // Catches resizing; can be extended to enforce minimum size for legibility
-        // but currently does nothing
-        var resizeOld = graph.resizeCell;
-        graph.resizeCell = function(cell, bounds, recurse) {
-            return resizeOld.apply(this, arguments);
-        }
+        
+        // Prevents selecting edges
+        graph.isCellSelectable = function(cell) {
+            if (graph.getModel().isEdge(cell)) {
+               return false;
+            }
+            return true;
+        };
 
         // Enables automatic layout on the graph and installs
         // a tree layout for all groups who's children are
@@ -262,9 +263,7 @@ function DeleteSubtree(graph, cell) {
 function TraverseTree(graph, vertex_function) {
     console.log("Traversing tree:\n" + vertex_function.toString());
     var root = graph.getModel().getCell('root');
-
     graph.traverse(root, true, vertex_function);
-    //vertex.setAttribute('cost', '0'); // Attack tree attributes can therefore be added and updated as such
 };
 
 // Modify nodes to have a new attack tree attribute, eg. cost, probability of attack.
@@ -275,6 +274,7 @@ function AddAttribute(graph) {
     TraverseTree(graph, function(vertex) {
         vertex.setAttribute(attributeName, '0');
     });
+    graph.refresh();
 };
 
 // Modify the cost attribute for that cell
@@ -283,4 +283,5 @@ function EditAttribute(graph, cell) {
     var attributeName = 'cost';
     var newValue = prompt("Enter new" + attributeName + "value for cell:", 0);
     cell.setAttribute(attributeName, newValue);
+    graph.refresh();
 };

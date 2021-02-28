@@ -1,13 +1,9 @@
 tree changes:
-    disable moving edges which disconnects nodes from the tree
-    disable highlighting nodes
     toolbar at top
     styling
-    deselect node editing on enter
-    fix cell resizing
+    keyhandler for editing labels
 
 attack tree logic:
-    storing variable attributes in nodes
-    drawing attributes on the tree
     handling and creating AND/OR nodes -> add and/or overlay similar to add child overlay button?
-    
+    when adding a child, change attribute values to default (or can they have additive values themselves?- ask)
+    add an attribute creator and editor
