@@ -2,7 +2,8 @@ tree changes:
     toolbar at top
     styling
     keyhandler for editing labels
-
+    AND/OR overlay
+    
 attack tree logic:
     handling and creating AND/OR nodes -> add and/or overlay similar to add child overlay button?
     when adding a child, change attribute values to default (or can they have additive values themselves?- ask)

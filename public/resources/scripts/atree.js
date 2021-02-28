@@ -185,14 +185,14 @@ function CreateContextMenu(graph, menu, cell, evt) {
                     });
             }
 
-            if (attributes.includes('cost')) {
+            if (attributes.includes('cost') && cell.getEdgeCount() == 1) {
                 menu.addItem('Edit cost', 'resources/img/mxgraph_images/copy.png', function() {
                     EditAttribute(graph, cell);
                 });
             };
 
             menu.addItem('Get Children', 'resources/img/mxgraph_images/connector.gif', function() {
-                GetChildren(cell);
+                console.log(GetChildren(cell));
             });
 
             // Only show the option to propagate on leaf cells
@@ -201,7 +201,6 @@ function CreateContextMenu(graph, menu, cell, evt) {
                     PropagateChangeUpTree(graph, cell, attributes, true);
                 }); 
             };
-            
 
             menu.addSeparator();
         }
@@ -283,7 +282,7 @@ function TraverseTree(graph, vertex_function) {
 // Modify nodes to have a new attack tree attribute, eg. cost, probability of attack.
 function AddAttribute(graph) {
     var attributeName = 'cost';
-
+    if (attributes.includes(attributeName)) return;
     attributes.push(attributeName);
     TraverseTree(graph, function(vertex) {
         vertex.setAttribute(attributeName, 0);
@@ -305,14 +304,16 @@ function EditAttribute(graph, cell) {
 function PropagateChangeUpTree(graph, cell, attributesToProgagate=attributes, canRefresh=false) {
     var parent = cell.getTerminal(true);
     var children = GetChildren(cell);
-
-    attributesToProgagate.forEach(function(attr) {
+    
+    if (children.length != 0) {
+        attributesToProgagate.forEach(function(attr) {
         var cumulativeValue = 0;
         for (i = 0; i < children.length; i++) {
             cumulativeValue += parseInt(children[i].getAttribute(attr));
         }
         cell.setAttribute(attr, cumulativeValue);
-    });
+        });
+    };
 
     if (parent === null) {
         return;
