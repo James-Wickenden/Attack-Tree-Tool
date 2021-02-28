@@ -1,4 +1,6 @@
 var doc;
+// TODO: replace this with a list of user-constructed objects containing default values, combination rules, name/description, etc.
+var attributes = [];
 
 function main(container) {
     // Checks if browser is supported, throws an error if not.
@@ -19,10 +21,6 @@ function main(container) {
         graph.panningHandler.useLeftButtonForPanning = true; // Pans by holding left mouse
         graph.setTooltips(!mxClient.IS_TOUCH);               // Disables tooltips on touch devices
 
-        // Stops editing on enter or escape keypress
-		var keyHandler = new mxKeyHandler(graph);
-        
-        
         // When editing a cell, ensures a minimum size for legibility
         // by overriding the getPreferredSizeForCell function
         var oldGetPreferredSizeForCell = graph.getPreferredSizeForCell;
@@ -87,6 +85,16 @@ function main(container) {
         graph.popupMenuHandler.factoryMethod = function(menu, cell, evt) {
             return CreateContextMenu(graph, menu, cell, evt);
         };
+
+        // Renders attribute values on cells as a temporary display method
+        graph.cellRenderer.getLabelValue = function(state) {
+            if (!state.view.graph.getModel().isVertex(state.cell)) return;
+			var result = state.cell.getAttribute('label');
+            attributes.forEach(function(attr) {
+                result += '\n' + attr + ':' + state.cell.getAttribute(attr);
+            });
+            return result;
+		};
 
         // Gets the default parent for inserting new cells.
         var parent = graph.getDefaultParent();
@@ -176,30 +184,26 @@ function CreateContextMenu(graph, menu, cell, evt) {
                     });
             }
 
+            if (attributes.includes('cost')) {
+                menu.addItem('Edit cost', 'resources/img/mxgraph_images/copy.png', function() {
+                    EditAttribute(graph, cell);
+                });
+            };
+
             menu.addSeparator();
         }
     }
 
     // Context: global
-    /*
-    menu.addItem('Zoom to fit', 'resources/scripts/editors/images/zoom.gif', function() {
-        graph.fit();
-    });
-
-    menu.addItem('Zoom out', 'resources/scripts/editors/images/zoomactual.gif', function() {
-        graph.zoomActual();
-    });
-    */
-
-   menu.addItem('Zoom in', 'resources/img/mxgraph_images/zoom_in.png', function() {
-    graph.zoomIn();
+    menu.addItem('Zoom in', 'resources/img/mxgraph_images/zoom_in.png', function() {
+        graph.zoomIn();
     });
 
     menu.addItem('Zoom out', 'resources/img/mxgraph_images/zoom_out.png', function() {
         graph.zoomOut();
     });
 
-    menu.addItem('Add attribute', 'resources/img/mxgraph_images/navigate_plus.png', function() {
+    menu.addItem('Add cost', 'resources/img/mxgraph_images/navigate_plus.png', function() {
         AddAttribute(graph);
     });
 
@@ -220,6 +224,13 @@ function AddChild(graph, cell) {
 
         var newnode = graph.insertVertex(parent, null, xmlnode);
         var geometry = graph.getModel().getGeometry(newnode);
+
+        // Any tree attributes need to be added
+        // the new child will be a leaf by definition, so we can assign default values
+        // TODO: set the parent [cell] to no longer render using default values?
+        attributes.forEach(function(attr) {
+            xmlnode.setAttribute(attr, '0');
+        });
 
         // Updates the geometry of the vertex with the preferred size computed in the graph
         var size = graph.getPreferredSizeForCell(newnode);
@@ -258,7 +269,18 @@ function TraverseTree(graph, vertex_function) {
 
 // Modify nodes to have a new attack tree attribute, eg. cost, probability of attack.
 function AddAttribute(graph) {
+    var attributeName = 'cost';
+
+    attributes.push(attributeName);
     TraverseTree(graph, function(vertex) {
-        vertex.setAttribute('cost', '0');
+        vertex.setAttribute(attributeName, '0');
     });
+};
+
+// Modify the cost attribute for that cell
+// should only be possible to modify leaves that already have a cost attribute
+function EditAttribute(graph, cell) {
+    var attributeName = 'cost';
+    var newValue = prompt("Enter new" + attributeName + "value for cell:", 0);
+    cell.setAttribute(attributeName, newValue);
 };
