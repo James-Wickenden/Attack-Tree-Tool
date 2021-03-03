@@ -357,7 +357,7 @@ function TraverseTree(graph, vertex_function) {
 // should only be possible to modify leaves that already have a cost attribute
 function EditAttribute(graph, cell, attributeName) {
     var attr = attributes[attributeName];
-    var newValue = parseInt(prompt("Enter new " + attributeName + " value for cell:", 0));
+    var newValue = parseFloat(prompt("Enter new " + attributeName + " value for cell:", 0));
     if (newValue === null || isNaN(newValue) || newValue > attr.max_val || newValue < attr.min_val) newValue = attr.default_val;
     cell.setAttribute(attributeName, newValue);
 
