@@ -107,7 +107,7 @@ function main(container) {
             var rootxml = doc.createElement('cell');
             rootxml.setAttribute('label', 'Root Goal');
             rootxml.setAttribute('nodetype', 'OR');
-            for (key in attributes) {
+            for (var key in attributes) {
                 var attr = attributes[key];
                 rootxml.setAttribute(attr.name, attr.default_val);
             }
@@ -209,9 +209,12 @@ function CreateContextMenu(graph, menu, cell, evt) {
 
             // Edit attributes of the cell;
             // will need to reference and edit the active attribute once attribute navigation is added.
-            if (cell.getEdgeCount() == 1) {
+            if (GetChildren(cell).length == 0) {
                 menu.addItem('Edit cost', 'resources/img/mxgraph_images/copy.png', function() {
-                    EditAttribute(graph, cell);
+                    EditAttribute(graph, cell, 'cost');
+                });
+                menu.addItem('Edit probability', 'resources/img/mxgraph_images/copy.png', function() {
+                    EditAttribute(graph, cell, 'probability');
                 });
             }
 
@@ -221,7 +224,7 @@ function CreateContextMenu(graph, menu, cell, evt) {
             });
 
             // Toggle the node between AND and OR states
-            if (GetChildren(cell).length > 0) {
+            if (GetChildren(cell).length > 1) {
                 var nodetype = cell.getAttribute('nodetype');
                 menu.addItem('Toggle AND/OR', 'resources/img/' + nodetype + '.png', function() {
                     graph.removeCellOverlays(cell);
@@ -229,6 +232,10 @@ function CreateContextMenu(graph, menu, cell, evt) {
                     cell.setAttribute('nodetype', new_nodetype);
                     Add_AND_OR_Overlay(graph, cell);
                     AddOverlays(graph, cell);
+                    for (var key in attributes) {
+                        PropagateChangeUpTree(graph, cell, attributes[key]);
+                    }
+                    graph.refresh();
                 });
             }
 
@@ -237,9 +244,14 @@ function CreateContextMenu(graph, menu, cell, evt) {
             // This is for debug purposes; propagation should happen automatically after each graph update:
             // eg Adding or deleting nodes, editing attributes, toggling a node state...
             if (GetChildren(cell).length == 0) {
-                menu.addItem('Propogate up', 'resources/img/mxgraph_images/check.png', function() {
-                    PropagateChangeUpTree(graph, cell, attributes, true);
-                }); 
+                menu.addItem('Propogate cost', 'resources/img/mxgraph_images/check.png', function() {
+                    PropagateChangeUpTree(graph, cell, attributes['cost']);
+                    graph.refresh();
+                });
+                menu.addItem('Propogate probability', 'resources/img/mxgraph_images/check.png', function() {
+                    PropagateChangeUpTree(graph, cell, attributes['probability']);
+                    graph.refresh();
+                });
             }
 
             menu.addSeparator();
@@ -271,20 +283,11 @@ function AddChild(graph, cell) {
     graph.getModel().beginUpdate();
     try {
         var xmlnode = doc.createElement('cell');
-        xmlnode.setAttribute('label', 'aAa');
         xmlnode.setAttribute('nodetype', 'OR');
 
         var newnode = graph.insertVertex(parent, null, xmlnode);
         var geometry = graph.getModel().getGeometry(newnode);
 
-        // Any tree attributes need to be added
-        // the new child will be a leaf by definition, so we can assign default values
-        // TODO: set the parent [cell] to no longer render using default values?
-        for (key in attributes) {
-            var attr = attributes[key];
-            xmlnode.setAttribute(attr.name, attr.default_val);
-        }
-        
         // Updates the geometry of the vertex with the preferred size computed in the graph
         var size = graph.getPreferredSizeForCell(newnode);
         geometry.width = size.width;
@@ -294,8 +297,20 @@ function AddChild(graph, cell) {
         var edge = graph.insertEdge(parent, null, '', cell, newnode);
         newnode.setTerminal(cell, true);
         
-        Add_AND_OR_Overlay(graph, cell);
+        if (GetChildren(cell).length > 1) Add_AND_OR_Overlay(graph, cell);
         AddOverlays(graph, newnode);
+
+        // Any tree attributes need to be added
+        // the new child will be a leaf by definition, so we can assign default values
+        // TODO: set the parent [cell] to no longer render using default values?
+        for (var key in attributes) {
+            var attr = attributes[key];
+            xmlnode.setAttribute(attr.name, attr.default_val);
+            cell.setAttribute(attr.name, attr.default_val);
+            PropagateChangeUpTree(graph, cell, attr);
+        }
+        xmlnode.setAttribute('label', 'New Cell[' + newnode.getId() / 2 + ']');
+        graph.refresh();
     }
     finally {
         graph.getModel().endUpdate();
@@ -316,13 +331,19 @@ function DeleteSubtree(graph, cell) {
     var parent = cell.getTerminal(true);
     var siblings = GetChildren(parent);
     console.log(siblings);
-    if (siblings.length == 1) {
+    if (siblings.length == 2) {
         graph.removeCellOverlays(parent);
         AddOverlays(graph, parent);
     }
 
-    // TODO: store cell parent before deleting, then after deleting call PropagateChangeUpTree() on parent
     graph.removeCells(cells);
+
+    for (var key in attributes) {
+        var attr = attributes[key];
+        parent.setAttribute(attr.name, attr.default_val);
+        PropagateChangeUpTree(graph, parent, attr);
+    }
+    graph.refresh();
 };
 
 // Performs depth-first traversal from the fixed root goal node
@@ -334,24 +355,30 @@ function TraverseTree(graph, vertex_function) {
 
 // Modify the cost attribute for that cell
 // should only be possible to modify leaves that already have a cost attribute
-function EditAttribute(graph, cell) {
-    var attributeName = 'cost';
-    var newValue = prompt("Enter new" + attributeName + "value for cell:", 0);
+function EditAttribute(graph, cell, attributeName) {
+    var attr = attributes[attributeName];
+    var newValue = parseInt(prompt("Enter new " + attributeName + " value for cell:", 0));
+    if (newValue === null || isNaN(newValue) || newValue > attr.max_val || newValue < attr.min_val) newValue = attr.default_val;
     cell.setAttribute(attributeName, newValue);
+
+    PropagateChangeUpTree(graph, cell, attr);
     graph.refresh();
 };
 
 // When an attribute is edited or a child is added or deleted,
 // the change must propagate up the tree to the root (or until a node is unaffected in every attribute)
-function PropagateChangeUpTree(graph, cell, attribute, canRefresh=false) {
+function PropagateChangeUpTree(graph, cell, attribute) {
     var parent = cell.getTerminal(true);
     var children = GetChildren(cell);
 
-    if (children.length != 0) {
+    if (children.length == 1) {
+        cell.setAttribute(attribute.name, parseFloat(children[0].getAttribute(attribute.name)));
+    }
+    else if (children.length > 1) {
         var func = ((cell.getAttribute('nodetype') == 'AND') ? attribute.AND_rule : attribute.OR_rule);
-        var cumulativeValue = attribute.default_val;
-        for (i = 0; i < children.length; i++) {
-            cumulativeValue = func(cumulativeValue, children[i].getAttribute(attribute.name));
+        var cumulativeValue = parseFloat(children[0].getAttribute(attribute.name));
+        for (i = 1; i < children.length; i++) {
+            cumulativeValue = func(cumulativeValue, parseFloat(children[i].getAttribute(attribute.name)));
         }
         cell.setAttribute(attribute.name, cumulativeValue);
     }
@@ -362,8 +389,6 @@ function PropagateChangeUpTree(graph, cell, attribute, canRefresh=false) {
     else {
         PropagateChangeUpTree(graph, parent, attribute);
     }
-
-    if (canRefresh) graph.refresh();
 };
 
 // Due to the mxCompositeLayout model, nodes must use the default parent

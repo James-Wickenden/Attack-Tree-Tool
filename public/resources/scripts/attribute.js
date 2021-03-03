@@ -19,12 +19,11 @@ function AddAttribute(attributeName = "UNDEF",
     attr.max_val = max_val;
 
     attributes[attributeName] = attr;
-    console.log(attributes);
     return attr;
 };
 
 // A pair of sample attributes for testing
-AddAttribute("cost", 100, 0, Infinity);
+AddAttribute("cost", 0, 0, Infinity);
 AddAttribute("probability", 0, 0, 1,
              function(current, child) {
                 return current * child;
