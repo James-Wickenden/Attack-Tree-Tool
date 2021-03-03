@@ -107,14 +107,14 @@ function main(container) {
             var rootxml = doc.createElement('cell');
             rootxml.setAttribute('label', 'Root Goal');
             rootxml.setAttribute('nodetype', 'OR');
-
             for (key in attributes) {
                 var attr = attributes[key];
                 rootxml.setAttribute(attr.name, attr.default_val);
             }
+
             var root = graph.insertVertex(parent, 'root', rootxml, w / 3, 20, 140, 60);
             graph.updateCellSize(root);
-            AddOverlays(graph, root, true);
+            AddOverlays(graph, root);
         }
         finally {
             graph.getModel().endUpdate();
@@ -142,25 +142,7 @@ function AddToolbar(container, graph) {
 
 // Adds buttons to a node with key node functions:
 // creating a new child from that node and deleting nodes and their subtree.
-function AddOverlays(graph, cell, isRoot) {
-
-    // Draw the AND/OR indicator on non-leaf nodes
-    var nodetype = cell.getAttribute('nodetype')
-    var img_src = 'resources/img/' + nodetype + '.png';
-    var overlay_andor = new mxCellOverlay(new mxImage(img_src, 24, 24), nodetype);
-    overlay_andor.cursor = 'hand';
-    overlay_andor.align = mxConstants.ALIGN_CENTER;
-    overlay_andor.verticalAlign = mxConstants.ALIGN_BOTTOM;
-    overlay_andor.addListener(mxEvent.CLICK, mxUtils.bind(this, function(sender, evt) {
-        // Clicking the overlay currently toggles the node type and updates the overlay
-        graph.removeCellOverlay(cell, overlay_andor);
-        var new_nodetype = {"AND": "OR", "OR": "AND"}[nodetype];
-        cell.setAttribute('nodetype', new_nodetype);
-        AddOverlays(graph, cell, isRoot);
-    }));
-
-    graph.addCellOverlay(cell, overlay_andor);
-
+function AddOverlays(graph, cell) {
     return; // Currently disabled to only use right-click context menu.
     
     // Draw the button to create a new child for that node
@@ -176,7 +158,7 @@ function AddOverlays(graph, cell, isRoot) {
 
     // Draw the button to delete that node
     // The root node must never be deleted, thus the extra case is needed.
-    if (!isRoot) {
+    if (!cell.getTerminal(true) === null) {
         var overlay_delete = new mxCellOverlay(new mxImage('resources/img/mxgraph_images/close.png', 30, 30), 'Delete');
         overlay_delete.cursor = 'hand';
         overlay_delete.offset = new mxPoint(-4, 8);
@@ -190,6 +172,20 @@ function AddOverlays(graph, cell, isRoot) {
     }
 };
 
+// Draw the AND/OR indicator on non-leaf nodes
+function Add_AND_OR_Overlay(graph, cell) {
+    graph.removeCellOverlays(cell);
+    var nodetype = cell.getAttribute('nodetype')
+    var img_src = 'resources/img/' + nodetype + '.png';
+    
+    var overlay_andor = new mxCellOverlay(new mxImage(img_src, 24, 24), nodetype);
+    overlay_andor.align = mxConstants.ALIGN_CENTER;
+    overlay_andor.verticalAlign = mxConstants.ALIGN_BOTTOM;
+
+    graph.addCellOverlay(cell, overlay_andor);
+    AddOverlays(graph, cell);
+};
+
 // Creates and handles the right click pop-up context menu
 // Allows for inserting new child nodes, deleting subtrees, and zooming
 function CreateContextMenu(graph, menu, cell, evt) {
@@ -198,32 +194,53 @@ function CreateContextMenu(graph, menu, cell, evt) {
     // Context: node right clicked
     if (cell != null) {
         if (model.isVertex(cell)) {
+            // Add a new leaf node as a child of that node
             menu.addItem('Add child', 'resources/scripts/editors/images/overlays/check.png', function() {
                     AddChild(graph, cell);
                 });
 
+            // Delete the subtree with that node as its root
+            // Cannot be called on the root node to prevent deleting the whole tree
             if (cell.id != 'root') {
                 menu.addItem('Delete', 'resources/scripts/editors/images/delete.gif', function() {
                         DeleteSubtree(graph, cell);
                     });
             }
 
+            // Edit attributes of the cell;
+            // will need to reference and edit the active attribute once attribute navigation is added.
             if (cell.getEdgeCount() == 1) {
                 menu.addItem('Edit cost', 'resources/img/mxgraph_images/copy.png', function() {
                     EditAttribute(graph, cell);
                 });
-            };
+            }
 
+            // Print the cell's children to the console. Used for debug.
             menu.addItem('Get Children', 'resources/img/mxgraph_images/connector.gif', function() {
                 console.log(GetChildren(cell));
             });
 
+            // Toggle the node between AND and OR states
+            if (GetChildren(cell).length > 0) {
+                var nodetype = cell.getAttribute('nodetype');
+                menu.addItem('Toggle AND/OR', 'resources/img/' + nodetype + '.png', function() {
+                    graph.removeCellOverlays(cell);
+                    var new_nodetype = {"AND": "OR", "OR": "AND"}[nodetype];
+                    cell.setAttribute('nodetype', new_nodetype);
+                    Add_AND_OR_Overlay(graph, cell);
+                    AddOverlays(graph, cell);
+                });
+            }
+
             // Only show the option to propagate on leaf cells
-            if (cell.getEdgeCount() == 1 && cell.getId() != 'root') {
+            // Propgate an attribute and its changes up the tree to the root, from the selected node.
+            // This is for debug purposes; propagation should happen automatically after each graph update:
+            // eg Adding or deleting nodes, editing attributes, toggling a node state...
+            if (GetChildren(cell).length == 0) {
                 menu.addItem('Propogate up', 'resources/img/mxgraph_images/check.png', function() {
                     PropagateChangeUpTree(graph, cell, attributes, true);
                 }); 
-            };
+            }
 
             menu.addSeparator();
         }
@@ -276,8 +293,9 @@ function AddChild(graph, cell) {
         // Adds the edge between the existing cell and the new vertex
         var edge = graph.insertEdge(parent, null, '', cell, newnode);
         newnode.setTerminal(cell, true);
-    
-        AddOverlays(graph, newnode, false);
+        
+        Add_AND_OR_Overlay(graph, cell);
+        AddOverlays(graph, newnode);
     }
     finally {
         graph.getModel().endUpdate();
@@ -286,11 +304,22 @@ function AddChild(graph, cell) {
 
 // Delete the subtree with cell as its root
 function DeleteSubtree(graph, cell) {
+    if (cell.getId == 'root') return;
+
     // Gets the subtree from cell downwards
     var cells = [];
     graph.traverse(cell, true, function(vertex) {
         cells.push(vertex);
     });
+
+    // Check to see if the parent becomes a leaf; if so, remove the AND/OR overlay
+    var parent = cell.getTerminal(true);
+    var siblings = GetChildren(parent);
+    console.log(siblings);
+    if (siblings.length == 1) {
+        graph.removeCellOverlays(parent);
+        AddOverlays(graph, parent);
+    }
 
     // TODO: store cell parent before deleting, then after deleting call PropagateChangeUpTree() on parent
     graph.removeCells(cells);
@@ -302,19 +331,6 @@ function TraverseTree(graph, vertex_function) {
     var root = graph.getModel().getCell('root');
     graph.traverse(root, true, vertex_function);
 };
-
-/*
-// Modify nodes to have a new attack tree attribute, eg. cost, probability of attack.
-function AddAttribute(graph) {
-    var attributeName = 'cost';
-    if (attributes.includes(attributeName)) return;
-    attributes.push(attributeName);
-    TraverseTree(graph, function(vertex) {
-        vertex.setAttribute(attributeName, 0);
-    });
-    graph.refresh();
-};
-*/
 
 // Modify the cost attribute for that cell
 // should only be possible to modify leaves that already have a cost attribute
