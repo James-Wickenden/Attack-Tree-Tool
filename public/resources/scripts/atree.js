@@ -91,9 +91,9 @@ function main(container) {
         graph.cellRenderer.getLabelValue = function(state) {
             if (!state.view.graph.getModel().isVertex(state.cell)) return;
 			var result = state.cell.getAttribute('label');
-            attributes.forEach(function(attr) {
-                result += '\n' + attr + ':' + state.cell.getAttribute(attr);
-            });
+            for (var key in attributes) {
+                result += '\n' + key + ':' + state.cell.getAttribute(key);
+            }
             return result;
 		};
 
@@ -108,6 +108,10 @@ function main(container) {
             rootxml.setAttribute('label', 'Root Goal');
             rootxml.setAttribute('nodetype', 'OR');
 
+            for (key in attributes) {
+                var attr = attributes[key];
+                rootxml.setAttribute(attr.name, attr.default_val);
+            }
             var root = graph.insertVertex(parent, 'root', rootxml, w / 3, 20, 140, 60);
             graph.updateCellSize(root);
             AddOverlays(graph, root, true);
@@ -141,15 +145,16 @@ function AddToolbar(container, graph) {
 function AddOverlays(graph, cell, isRoot) {
 
     // Draw the AND/OR indicator on non-leaf nodes
-    var img_src = 'resources/img/' + cell.getAttribute('nodetype') + '.png';
-    console.log(img_src);
-    var overlay_andor = new mxCellOverlay(new mxImage(img_src, 24, 24), cell.getAttribute('nodetype'));
+    var nodetype = cell.getAttribute('nodetype')
+    var img_src = 'resources/img/' + nodetype + '.png';
+    var overlay_andor = new mxCellOverlay(new mxImage(img_src, 24, 24), nodetype);
     overlay_andor.cursor = 'hand';
     overlay_andor.align = mxConstants.ALIGN_CENTER;
     overlay_andor.verticalAlign = mxConstants.ALIGN_BOTTOM;
     overlay_andor.addListener(mxEvent.CLICK, mxUtils.bind(this, function(sender, evt) {
+        // Clicking the overlay currently toggles the node type and updates the overlay
         graph.removeCellOverlay(cell, overlay_andor);
-        var new_nodetype = {"AND": "OR", "OR": "AND"}[cell.getAttribute('nodetype')];
+        var new_nodetype = {"AND": "OR", "OR": "AND"}[nodetype];
         cell.setAttribute('nodetype', new_nodetype);
         AddOverlays(graph, cell, isRoot);
     }));
@@ -203,7 +208,7 @@ function CreateContextMenu(graph, menu, cell, evt) {
                     });
             }
 
-            if (attributes.includes('cost') && cell.getEdgeCount() == 1) {
+            if (cell.getEdgeCount() == 1) {
                 menu.addItem('Edit cost', 'resources/img/mxgraph_images/copy.png', function() {
                     EditAttribute(graph, cell);
                 });
@@ -234,7 +239,7 @@ function CreateContextMenu(graph, menu, cell, evt) {
     });
 
     menu.addItem('Add cost', 'resources/img/mxgraph_images/navigate_plus.png', function() {
-        AddAttribute(graph);
+        //AddAttribute(graph);
     });
 
     menu.addItem('Traverse', 'resources/img/mxgraph_images/redo.png', function() {
@@ -258,10 +263,11 @@ function AddChild(graph, cell) {
         // Any tree attributes need to be added
         // the new child will be a leaf by definition, so we can assign default values
         // TODO: set the parent [cell] to no longer render using default values?
-        attributes.forEach(function(attr) {
-            xmlnode.setAttribute(attr, 0);
-        });
-
+        for (key in attributes) {
+            var attr = attributes[key];
+            xmlnode.setAttribute(attr.name, attr.default_val);
+        }
+        
         // Updates the geometry of the vertex with the preferred size computed in the graph
         var size = graph.getPreferredSizeForCell(newnode);
         geometry.width = size.width;
@@ -297,6 +303,7 @@ function TraverseTree(graph, vertex_function) {
     graph.traverse(root, true, vertex_function);
 };
 
+/*
 // Modify nodes to have a new attack tree attribute, eg. cost, probability of attack.
 function AddAttribute(graph) {
     var attributeName = 'cost';
@@ -307,6 +314,7 @@ function AddAttribute(graph) {
     });
     graph.refresh();
 };
+*/
 
 // Modify the cost attribute for that cell
 // should only be possible to modify leaves that already have a cost attribute
@@ -319,26 +327,25 @@ function EditAttribute(graph, cell) {
 
 // When an attribute is edited or a child is added or deleted,
 // the change must propagate up the tree to the root (or until a node is unaffected in every attribute)
-function PropagateChangeUpTree(graph, cell, attributesToProgagate=attributes, canRefresh=false) {
+function PropagateChangeUpTree(graph, cell, attribute, canRefresh=false) {
     var parent = cell.getTerminal(true);
     var children = GetChildren(cell);
-    
-    if (children.length != 0) {
-        attributesToProgagate.forEach(function(attr) {
-        var cumulativeValue = 0;
-        for (i = 0; i < children.length; i++) {
-            cumulativeValue += parseInt(children[i].getAttribute(attr));
-        }
-        cell.setAttribute(attr, cumulativeValue);
-        });
-    };
 
+    if (children.length != 0) {
+        var func = ((cell.getAttribute('nodetype') == 'AND') ? attribute.AND_rule : attribute.OR_rule);
+        var cumulativeValue = attribute.default_val;
+        for (i = 0; i < children.length; i++) {
+            cumulativeValue = func(cumulativeValue, children[i].getAttribute(attribute.name));
+        }
+        cell.setAttribute(attribute.name, cumulativeValue);
+    }
+    
     if (parent === null) {
         return;
     }
     else {
-        PropagateChangeUpTree(graph, parent, attributesToProgagate);
-    };
+        PropagateChangeUpTree(graph, parent, attribute);
+    }
 
     if (canRefresh) graph.refresh();
 };

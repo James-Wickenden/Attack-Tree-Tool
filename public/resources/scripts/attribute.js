@@ -1,13 +1,15 @@
 "use strict";
 
-var attributes_list = []
+// Dictionary of the current graph attributes
+// The keys are attribute names, and the values are objects holding the attribute data
+var attributes = {};
 
+// Adds a new attribute to the dictionary, its rules, and its domain.
 function AddAttribute(attributeName = "UNDEF",
                       default_val = 0, min_val = 0, max_val = Infinity,
                       AND_rule = function(current, child) { return current + child; },
                       OR_rule = function(current, child) { return Math.min(current, child); })
 {
-    if (AttributeAlreadyExists(attributeName)) { return; }
     const attr = {};
     attr.name = attributeName;
     attr.AND_rule = AND_rule;
@@ -16,20 +18,12 @@ function AddAttribute(attributeName = "UNDEF",
     attr.min_val = min_val;
     attr.max_val = max_val;
 
-    attributes_list.push(attr);
-    console.log(attributes_list);
+    attributes[attributeName] = attr;
+    console.log(attributes);
     return attr;
 };
 
-function AttributeAlreadyExists(attributeName) {
-    var alreadyExists = false;
-    attributes_list.forEach(function(attr) {
-        if (attr.name == attributeName) alreadyExists = true;
-    });
-    return alreadyExists;
-};
-
-AddAttribute("cost", 100, 0, Infinity);
+// A pair of sample attributes for testing
 AddAttribute("cost", 100, 0, Infinity);
 AddAttribute("probability", 0, 0, 1,
              function(current, child) {
