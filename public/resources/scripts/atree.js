@@ -106,7 +106,7 @@ function main(container) {
             var w = graph.container.offsetWidth;
             var rootxml = doc.createElement('cell');
             rootxml.setAttribute('label', 'Root Goal');
-            rootxml.setAttribute('nodetype', 'or');
+            rootxml.setAttribute('nodetype', 'OR');
 
             var root = graph.insertVertex(parent, 'root', rootxml, w / 3, 20, 140, 60);
             graph.updateCellSize(root);
@@ -139,7 +139,25 @@ function AddToolbar(container, graph) {
 // Adds buttons to a node with key node functions:
 // creating a new child from that node and deleting nodes and their subtree.
 function AddOverlays(graph, cell, isRoot) {
+
+    // Draw the AND/OR indicator on non-leaf nodes
+    var img_src = 'resources/img/' + cell.getAttribute('nodetype') + '.png';
+    console.log(img_src);
+    var overlay_andor = new mxCellOverlay(new mxImage(img_src, 24, 24), cell.getAttribute('nodetype'));
+    overlay_andor.cursor = 'hand';
+    overlay_andor.align = mxConstants.ALIGN_CENTER;
+    overlay_andor.verticalAlign = mxConstants.ALIGN_BOTTOM;
+    overlay_andor.addListener(mxEvent.CLICK, mxUtils.bind(this, function(sender, evt) {
+        graph.removeCellOverlay(cell, overlay_andor);
+        var new_nodetype = {"AND": "OR", "OR": "AND"}[cell.getAttribute('nodetype')];
+        cell.setAttribute('nodetype', new_nodetype);
+        AddOverlays(graph, cell, isRoot);
+    }));
+
+    graph.addCellOverlay(cell, overlay_andor);
+
     return; // Currently disabled to only use right-click context menu.
+    
     // Draw the button to create a new child for that node
     var overlay_addchild = new mxCellOverlay(new mxImage('resources/img/mxgraph_images/add.png', 24, 24), 'Add Child');
     overlay_addchild.cursor = 'hand';
@@ -232,7 +250,7 @@ function AddChild(graph, cell) {
     try {
         var xmlnode = doc.createElement('cell');
         xmlnode.setAttribute('label', 'aAa');
-        xmlnode.setAttribute('nodetype', 'or');
+        xmlnode.setAttribute('nodetype', 'OR');
 
         var newnode = graph.insertVertex(parent, null, xmlnode);
         var geometry = graph.getModel().getGeometry(newnode);
