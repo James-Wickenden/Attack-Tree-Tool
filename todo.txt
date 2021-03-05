@@ -8,4 +8,4 @@ attack tree logic:
     add a text parser
     add a div for displaying textually
     add XML I/O
-    look into cloud collaborative editing
+    look into cloud collaborative editing with socket.io?
