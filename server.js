@@ -8,13 +8,9 @@ express()
     console.log("Loading main...")
     res.sendFile(path.join(__dirname, 'public/main.html'))
   })
-  .get('/mxgraph_test_1', (req, res) => {
-    console.log("Loading test mxgraph model 1...")
-    res.sendFile(path.join(__dirname, 'public/mxgraph_test_1.html'))
-  })
-  .get('/mxgraph_test_2', (req, res) => {
-    console.log("Loading test mxgraph model 2...")
-    res.sendFile(path.join(__dirname, 'public/mxgraph_test_2.html'))
+  .get('/socketchat', (req, res) => {
+    console.log("Loading socket.io test chat...")
+    res.sendFile(path.join(__dirname, 'public/socketchat.html'))
   })
   .get('/editor1', (req, res) => {
     console.log("Loading graph editor A...")
