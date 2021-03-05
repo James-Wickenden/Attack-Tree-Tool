@@ -16,10 +16,6 @@ express()
     console.log("Loading test mxgraph model 2...")
     res.sendFile(path.join(__dirname, 'public/mxgraph_test_2.html'))
   })
-  .get('/versions', (req, res) => {
-    console.log("Loading UI versions...")
-    res.sendFile(path.join(__dirname, 'public/versions.html'))
-  })
   .get('/editor1', (req, res) => {
     console.log("Loading graph editor A...")
     res.sendFile(path.join(__dirname, 'public/editor1.html'))
