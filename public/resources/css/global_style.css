@@ -7,11 +7,9 @@ html, body {
     height: 100%;
 }
 
-div {
-    /*height: 80%;
-    width: 800px;*/
+#graphContainer {
+    background-color: beige;
+    border: 1px solid black;
     overflow: hidden;
     position: absolute;
-    border: 1px solid black;
-    background-color: beige;
 }

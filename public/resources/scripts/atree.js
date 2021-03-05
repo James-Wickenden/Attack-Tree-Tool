@@ -120,24 +120,25 @@ function main(container) {
             graph.getModel().endUpdate();
         }
 
-        //AddToolbar(container, graph);
+        AddNavigator(container, graph);
     }
 };
 
-// Adds a toolbar with zoom controls.
-// Currently not used as it creates a toolbar not constrained to the tree div.
-// I might replace this model with a fixed toolbar in another div with overarching functionality eg attribute control, XML/Yaml handling, File controls etc.
-function AddToolbar(container, graph) {
-    var toolbarContainer = document.createElement('div');
-
-    container.appendChild(toolbarContainer);
-    var tb = new mxToolbar(toolbarContainer);
+// Adds a navigator to scroll through attributes.
+// TODO: add another fixed toolbar in another div with overarching functionality eg attribute control, XML/Yaml handling, File controls etc.
+function AddNavigator(container, graph) {
+    var navigator_div = document.createElement('div');
     
-    tb.addItem('Zoom In', 'resources/img/mxgraph_images/zoom_in32.png',function(evt) { graph.zoomIn(); });
-    tb.addItem('Zoom Out', 'resources/img/mxgraph_images/zoom_out32.png',function(evt) { graph.zoomOut(); });
+    navigator_div.style.padding = '4px';
+	var tb = new mxToolbar(navigator_div);
+    var box = container.getBoundingClientRect();
+    tb.addItem("Previous attribute", 'resources/img/arrow_right_40.png', function(evt){console.log('test1');});
+    tb.addItem("Next attribute", 'resources/img/arrow_left_40.png', function(evt){console.log('test2');});
     
-    wnd = new mxWindow('Tools', toolbarContainer, 0, 0, 200, 66, false);
-    wnd.setVisible(true);
+    var wnd = new mxWindow('Attribute Navigator', navigator_div, box.left+1, box.top+1, 200, 66, true, false);
+	wnd.setScrollable(false);
+	wnd.setResizable(false);
+	wnd.setVisible(true);
 };
 
 // Adds buttons to a node with key node functions:

@@ -1,4 +1,4 @@
-# nodejs_atree
+# Attack Tree Teaching Tool
 
 Creating a web tool for building Attack Tree threat models with live collaboration between users.
 
