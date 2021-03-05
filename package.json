@@ -19,6 +19,8 @@
   "homepage": "https://github.com/James-Wickenden/nodejs_atree#readme",
   "dependencies": {
     "express": "^4.17.1",
-    "mxgraph": "^4.2.2"
+    "fs": "0.0.1-security",
+    "mxgraph": "^4.2.2",
+    "socket.io": "^3.1.2"
   }
 }

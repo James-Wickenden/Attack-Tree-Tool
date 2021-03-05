@@ -1,27 +1,40 @@
-const express = require('express')
-const path = require('path')
-const PORT = process.env.PORT || 5000
+"use strict";
 
-express()
+const express = require('express');
+const app = express(); 
+const path = require('path');
+const PORT = process.env.PORT || 5000;
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+
+app
   .use(express.static(path.join(__dirname, 'public')))
   .get('/', (req, res) => {
     console.log("Loading main...")
-    res.sendFile(path.join(__dirname, 'public/main.html'))
+    res.sendFile(path.join(__dirname, '/public/main.html'))
   })
   .get('/socketchat', (req, res) => {
     console.log("Loading socket.io test chat...")
-    res.sendFile(path.join(__dirname, 'public/socketchat.html'))
+    res.sendFile(path.join(__dirname, '/public/socketchat.html'))
   })
   .get('/editor1', (req, res) => {
     console.log("Loading graph editor A...")
-    res.sendFile(path.join(__dirname, 'public/editor1.html'))
+    res.sendFile(path.join(__dirname, '/public/editor1.html'))
   })
   .get('/editor2', (req, res) => {
     console.log("Loading graph editor B...")
-    res.sendFile(path.join(__dirname, 'public/editor2.html'))
+    res.sendFile(path.join(__dirname, '/public/editor2.html'))
   })
   .get('/tree_builder', (req, res) => {
     console.log("Loading tree builder...")
-    res.sendFile(path.join(__dirname, 'public/tree_builder.html'))
+    res.sendFile(path.join(__dirname, '/public/tree_builder.html'))
   })
-  .listen(PORT, () => console.log(`Listening on ${ PORT }`))
+  //.listen(PORT, () => console.log(`Listening on port ${ PORT }`));
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+});
+
+http.listen(PORT, () => {
+  console.log(`Listening on port ${ PORT }`);
+});
