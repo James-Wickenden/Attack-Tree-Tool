@@ -58,8 +58,8 @@ function main(container) {
                     elt.setAttribute('label', newValue);
                     newValue = elt;
                 }
-
                 cellLabelChanged.apply(this, arguments);
+                load_textual_graph(ParseTextually(graph));
             };
         
         // Prevents selecting edges
@@ -160,7 +160,7 @@ function AddNavigator(container, graph) {
         graph.refresh();
     });
     
-    wnd = new mxWindow('Attribute Navigator', navigator_div, box.left+1, box.top+20, 200, 66, true, false);
+    wnd = new mxWindow('Attribute Navigator', navigator_div, box.left+1, box.top+1, 200, 66, true, false);
 	wnd.setScrollable(false);
 	wnd.setResizable(false);
 	wnd.setVisible(true);
