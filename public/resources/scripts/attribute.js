@@ -23,8 +23,12 @@ function AddAttribute(attributeName = "UNDEF",
    return attr;
 };
 
+// Navigating througha ttributes requires that we index them; this is done by iterating through keys and assigning sequenctial indices to them.
+// The result is a second dictionary that has index keys and attribute name values, which is returned.
 function GetIndexFromAttributes() {
    var attribute_indices = {};
+   attribute_indices[-1] = "all";
+   attribute_indices[-2] = "none";
    var i = 0;
    for (var key in attributes) {
       attribute_indices[i] = key;

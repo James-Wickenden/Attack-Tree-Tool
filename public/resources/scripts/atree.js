@@ -96,7 +96,7 @@ function main(container) {
                     result += '\n' + key + ':' + state.cell.getAttribute(key); 
                 }
             }
-            else {
+            else if (cur_attribute_index != -2) {
                 var attr_name = GetIndexFromAttributes()[cur_attribute_index];
                 result += '\n' + attr_name + ':' + state.cell.getAttribute(attr_name); 
             }
@@ -135,26 +135,27 @@ function main(container) {
 // TODO: add another fixed toolbar in another div with overarching functionality eg attribute control, XML/Yaml handling, File controls etc.
 function AddNavigator(container, graph) {
     var navigator_div = document.createElement('div');
-    
+    var wnd;
     navigator_div.style.padding = '4px';
 	var tb = new mxToolbar(navigator_div);
     var box = container.getBoundingClientRect();
     tb.addItem("Previous attribute", 'resources/img/arrow_left_40.png', function(evt) {
         cur_attribute_index += -1;
-        if (cur_attribute_index < -1) cur_attribute_index = Object.keys(attributes).length-1;
+        if (cur_attribute_index < -2) cur_attribute_index = Object.keys(attributes).length-1;
+        wnd.setTitle("Showing Attribute: " + GetIndexFromAttributes()[cur_attribute_index]);
         graph.refresh();
     });
     tb.addItem("Next attribute", 'resources/img/arrow_right_40.png', function(evt){ 
         cur_attribute_index += 1;
-        if (cur_attribute_index >= Object.keys(attributes).length) cur_attribute_index = -1;
+        if (cur_attribute_index >= Object.keys(attributes).length) cur_attribute_index = -2;
+        wnd.setTitle("Showing Attribute: " + GetIndexFromAttributes()[cur_attribute_index]);
         graph.refresh();
     });
     
-    var wnd = new mxWindow('Attribute Navigator', navigator_div, box.left+1, box.top+1, 200, 66, true, false);
+    wnd = new mxWindow('Attribute Navigator', navigator_div, box.left+1, box.top+1, 200, 66, true, false);
 	wnd.setScrollable(false);
 	wnd.setResizable(false);
 	wnd.setVisible(true);
-    
 };
 
 // Adds buttons to a node with key node functions:
@@ -290,6 +291,10 @@ function CreateContextMenu(graph, menu, cell, evt) {
 
     menu.addItem('Traverse', 'resources/img/mxgraph_images/redo.png', function() {
         TraverseTree(graph, function(vertex) { console.log(vertex); });
+    });
+
+    menu.addItem('Parse Text', 'resources/img/mxgraph_images/printer.png', function() {
+        ParseTextually(graph);
     });
 };
 
@@ -429,4 +434,32 @@ function GetChildren(cell) {
     }
     
     return children;
+}
+
+// Parse the tree in a depth-first manner, building a list of the textual representation.
+function ParseTextually(graph) {
+    var root = graph.getModel().getCell('root');
+    var graph_list = DepthFirst(root, '1.');
+
+    console.log(graph_list);
+    return graph_list;
+};
+
+// Depth first algorithm that parses the tree and recursively builds a list of strings
+// Each string contains the relevant textual data for a cell.
+function DepthFirst(cell, cell_path_str) {
+    var res = [];
+    var cell_str = cell_path_str + '  ';
+
+    cell_str += cell.getAttribute('label') + '\n';
+    for (var key in attributes) {
+        cell_str += '  ' + key + ': ' + cell.getAttribute(key) + '\n';
+    }
+    res.push(cell_str);
+
+    var children = GetChildren(cell);
+    for (var i = 0; i < children.length; i++) {
+        res = res.concat(DepthFirst(children[i], cell_path_str + (i + 1).toString() + '.'));
+    }
+    return res;
 }
