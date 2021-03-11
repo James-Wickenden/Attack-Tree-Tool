@@ -13,3 +13,8 @@ html, body {
     overflow: hidden;
     position: absolute;
 }
+
+#attributeNavigator {
+    display: flex;
+    border: 1px solid black;
+  }

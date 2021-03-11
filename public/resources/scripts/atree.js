@@ -1,6 +1,5 @@
 var doc;
 // TODO: replace this with a list of user-constructed objects containing default values, combination rules, name/description, etc.
-var attributes = [];
 
 function main(container) {
     // Checks if browser is supported, throws an error if not.
@@ -91,9 +90,17 @@ function main(container) {
         graph.cellRenderer.getLabelValue = function(state) {
             if (!state.view.graph.getModel().isVertex(state.cell)) return;
 			var result = state.cell.getAttribute('label');
-            for (var key in attributes) {
-                result += '\n' + key + ':' + state.cell.getAttribute(key);
+
+            if (cur_attribute_index == -1) {
+                for (var key in attributes) {
+                    result += '\n' + key + ':' + state.cell.getAttribute(key); 
+                }
             }
+            else {
+                var attr_name = GetIndexFromAttributes()[cur_attribute_index];
+                result += '\n' + attr_name + ':' + state.cell.getAttribute(attr_name); 
+            }
+            
             return result;
 		};
 
@@ -132,13 +139,22 @@ function AddNavigator(container, graph) {
     navigator_div.style.padding = '4px';
 	var tb = new mxToolbar(navigator_div);
     var box = container.getBoundingClientRect();
-    tb.addItem("Previous attribute", 'resources/img/arrow_right_40.png', function(evt){console.log('test1');});
-    tb.addItem("Next attribute", 'resources/img/arrow_left_40.png', function(evt){console.log('test2');});
+    tb.addItem("Previous attribute", 'resources/img/arrow_left_40.png', function(evt) {
+        cur_attribute_index += -1;
+        if (cur_attribute_index < -1) cur_attribute_index = Object.keys(attributes).length-1;
+        graph.refresh();
+    });
+    tb.addItem("Next attribute", 'resources/img/arrow_right_40.png', function(evt){ 
+        cur_attribute_index += 1;
+        if (cur_attribute_index >= Object.keys(attributes).length) cur_attribute_index = -1;
+        graph.refresh();
+    });
     
     var wnd = new mxWindow('Attribute Navigator', navigator_div, box.left+1, box.top+1, 200, 66, true, false);
 	wnd.setScrollable(false);
 	wnd.setResizable(false);
 	wnd.setVisible(true);
+    
 };
 
 // Adds buttons to a node with key node functions:
