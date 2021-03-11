@@ -7,16 +7,21 @@
     <link rel="stylesheet" type="text/css" href="resources/css/global_style.css"/>
 
     <!-- Loads and initialises mxgraph and its basepath -->
-    <script type="text/javascript"> mxBasePath = 'resources/scripts/mxgraph';</script>
+    <script type="text/javascript"> mxBasePath = 'resources/scripts/mxgraph'; </script>
     <script type= "text/javascript" src='resources/scripts/mxgraph/js/mxClient.js'></script>
     <script type= "text/javascript" src='resources/scripts/atree.js'></script>
     <script type= "text/javascript" src='resources/scripts/attribute.js'></script>
+    <script type= "text/javascript" src='resources/scripts/textual_view.js'></script>
 </head>
 
 <body onload="main(document.getElementById('graphContainer'));">
     <h1>Tree builder</h1>
-    <div id='graphContainer' style='width:80%; height:80%;'>
-        <!--<div id='attributeNavigator' style='width:20%; height:10%;'></div>-->
+    <div id='mxflexContainer';>
+        <div id='graphContainer'></div>
+        <div id='textContainer'>
+            <ul id="textual_cells_list"></ul>
+        </div>
     </div>
+    
 </body>
 </html>

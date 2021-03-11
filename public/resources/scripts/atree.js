@@ -32,6 +32,14 @@ function main(container) {
             return result;
         };
 
+        var oldRefresh = graph.refresh;
+        graph.refresh = function() {
+            var result = oldRefresh.apply(this, arguments);
+            var txt = ParseTextually(graph);
+            load_textual_graph(txt);
+            return result;
+        };
+
         // Renders the label attribute on nodes
         // This is done as attack tree nodes are XML structures instead of simple mxcells
         graph.convertValueToString = function(cell) {
@@ -128,6 +136,7 @@ function main(container) {
         }
 
         AddNavigator(container, graph);
+        graph.refresh();
     }
 };
 
@@ -152,7 +161,7 @@ function AddNavigator(container, graph) {
         graph.refresh();
     });
     
-    wnd = new mxWindow('Attribute Navigator', navigator_div, box.left+1, box.top+1, 200, 66, true, false);
+    wnd = new mxWindow('Attribute Navigator', navigator_div, box.left+1, box.top+20, 200, 66, true, false);
 	wnd.setScrollable(false);
 	wnd.setResizable(false);
 	wnd.setVisible(true);
@@ -294,7 +303,8 @@ function CreateContextMenu(graph, menu, cell, evt) {
     });
 
     menu.addItem('Parse Text', 'resources/img/mxgraph_images/printer.png', function() {
-        ParseTextually(graph);
+        var txt = ParseTextually(graph);
+        load_textual_graph(txt);
     });
 };
 
@@ -449,11 +459,15 @@ function ParseTextually(graph) {
 // Each string contains the relevant textual data for a cell.
 function DepthFirst(cell, cell_path_str) {
     var res = [];
-    var cell_str = cell_path_str + '  ';
+    var cell_str = cell_path_str + '&nbsp;';
+    var spacecount = "";
+    for (var sp=0;sp<=cell_path_str.length;sp++) {
+        spacecount += '&nbsp;';
+    }
 
     cell_str += cell.getAttribute('label') + '\n';
     for (var key in attributes) {
-        cell_str += '  ' + key + ': ' + cell.getAttribute(key) + '\n';
+        cell_str += spacecount + key + ': ' + cell.getAttribute(key) + '\n';
     }
     res.push(cell_str);
 

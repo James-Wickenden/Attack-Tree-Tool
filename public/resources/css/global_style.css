@@ -7,14 +7,35 @@ html, body {
     height: 100%;
 }
 
-#graphContainer {
-    background-color: beige;
-    border: 1px solid black;
-    overflow: hidden;
-    position: absolute;
+#mxflexContainer {
+    display: flex;
+    height: 90%;
 }
 
-#attributeNavigator {
-    display: flex;
+#graphContainer {
+    flex: 3;
+    background-color: beige;
     border: 1px solid black;
-  }
+    margin-right: 20px;
+}
+
+#textContainer {
+    flex: 2;
+    background-color: white;
+    border: 1px solid black;
+}
+
+#textual_cells_list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    font-family: 'Courier New', monospace;
+}
+
+#textual_cells_list > li {
+    padding: 0.5rem 1rem;
+}
+
+#textual_cells_list > li:nth-child(odd) {
+    background: #efefef;
+}
