@@ -32,12 +32,11 @@ function main(container) {
             return result;
         };
 
-        var oldRefresh = graph.refresh;
+        // Overrides the graph.refresh method to also update the textual display
+        var defaultRefresh = graph.refresh;
         graph.refresh = function() {
-            var result = oldRefresh.apply(this, arguments);
-            var txt = ParseTextually(graph);
-            load_textual_graph(txt);
-            return result;
+            load_textual_graph(ParseTextually(graph));
+            return defaultRefresh.apply(this, arguments);;
         };
 
         // Renders the label attribute on nodes
@@ -444,36 +443,4 @@ function GetChildren(cell) {
     }
     
     return children;
-}
-
-// Parse the tree in a depth-first manner, building a list of the textual representation.
-function ParseTextually(graph) {
-    var root = graph.getModel().getCell('root');
-    var graph_list = DepthFirst(root, '1.');
-
-    console.log(graph_list);
-    return graph_list;
-};
-
-// Depth first algorithm that parses the tree and recursively builds a list of strings
-// Each string contains the relevant textual data for a cell.
-function DepthFirst(cell, cell_path_str) {
-    var res = [];
-    var cell_str = cell_path_str + '&nbsp;';
-    var spacecount = "";
-    for (var sp=0;sp<=cell_path_str.length;sp++) {
-        spacecount += '&nbsp;';
-    }
-
-    cell_str += cell.getAttribute('label') + '\n';
-    for (var key in attributes) {
-        cell_str += spacecount + key + ': ' + cell.getAttribute(key) + '\n';
-    }
-    res.push(cell_str);
-
-    var children = GetChildren(cell);
-    for (var i = 0; i < children.length; i++) {
-        res = res.concat(DepthFirst(children[i], cell_path_str + (i + 1).toString() + '.'));
-    }
-    return res;
 }
