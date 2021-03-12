@@ -28,8 +28,18 @@
 var socket = io();
 
 function EmitTree(graph) {
-    var nodes = [];
-    TraverseTree(graph, function(vertex) { nodes.push(vertex); });
-    console.log(nodes);
-    socket.emit('event', nodes);
+    var tree_data = {};
+    var cells = [];
+    TraverseTree(graph, function(vertex) {
+        var cell = {};
+        cell.data = vertex.value;
+        cell.id = vertex.id;
+        cell.parent = null;
+        if (vertex.source != null) cell.parent = vertex.source.id;
+        cells.push(cell);
+    });
+    tree_data.cells = cells;
+    tree_data.attributes = attributes;
+    console.log(tree_data);
+    socket.emit('tree_data', tree_data);
 };

@@ -41,11 +41,11 @@ function setup_socket_io() {
     socket.on('disconnect', () => {
       console.log('user disconnected');
     });
-    socket.on('chat message', (msg) => {
-      console.log('message: ' + msg);
-      io.emit('chat message', msg);
+    socket.on('tree_data', (msg) => {
+      console.log(msg);
+      io.emit('tree_data', msg);
     });
   });
 
-  io.emit('some event', { someProperty: 'some value', otherProperty: 'other value' }); // This will emit the event to all connected sockets
+  //io.emit('some event', { someProperty: 'some value', otherProperty: 'other value' }); // This will emit the event to all connected sockets
 };
