@@ -27,14 +27,6 @@ function setup_express() {
     console.log("Loading socket.io test chat...")
     res.sendFile(path.join(__dirname, '/public/socketchat.html'))
   })
-  .get('/editor1', (req, res) => {
-    console.log("Loading graph editor A...")
-    res.sendFile(path.join(__dirname, '/public/editor1.html'))
-  })
-  .get('/editor2', (req, res) => {
-    console.log("Loading graph editor B...")
-    res.sendFile(path.join(__dirname, '/public/editor2.html'))
-  })
   .get('/tree_builder', (req, res) => {
     console.log("Loading tree builder...")
     res.sendFile(path.join(__dirname, '/public/tree_builder.html'))

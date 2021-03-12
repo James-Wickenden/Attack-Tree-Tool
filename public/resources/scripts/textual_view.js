@@ -5,7 +5,7 @@ function ParseTextually(graph) {
     var root = graph.getModel().getCell('root');
     var graph_list = DepthFirst(root, '1.');
 
-    console.log(graph_list);
+    //console.log(graph_list);
     return graph_list;
 };
 

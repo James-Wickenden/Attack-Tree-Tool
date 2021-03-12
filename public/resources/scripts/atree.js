@@ -305,6 +305,10 @@ function CreateContextMenu(graph, menu, cell, evt) {
         var txt = ParseTextually(graph);
         load_textual_graph(txt);
     });
+
+    menu.addItem('Emit Tree', 'resources/img/mxgraph_images/dot.gif', function() {
+        EmitTree(graph);
+    });
 };
 
 // Create a new leaf node with cell as its parent node
