@@ -45,7 +45,7 @@ function main(container) {
         // Overrides the graph.refresh method to also update the textual display
         var defaultRefresh = graph.refresh;
         graph.refresh = function() {
-            Load_textual_graph(ParseTextually(graph));
+            Load_textual_graph(ParseTextually(graph), graph);
             return defaultRefresh.apply(this, arguments);;
         };
 
@@ -69,7 +69,7 @@ function main(container) {
                     newValue = elt;
                 }
                 cellLabelChanged.apply(this, arguments);
-                Load_textual_graph(ParseTextually(graph));
+                Load_textual_graph(ParseTextually(graph), graph);
             };
         
         // Prevents selecting edges
@@ -312,7 +312,7 @@ function CreateContextMenu(graph, menu, cell, evt) {
     });
 
     menu.addItem('Parse Text', 'resources/img/mxgraph_images/printer.png', function() {
-        Load_textual_graph(ParseTextually(graph));
+        Load_textual_graph(ParseTextually(graph), graph);
     });
 
     menu.addItem('Emit Tree', 'resources/img/mxgraph_images/dot.gif', function() {
