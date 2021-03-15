@@ -19,6 +19,16 @@ function main(container) {
         graph.centerZoom = false;                            // Sets to zoom from the top left, not the center
         graph.panningHandler.useLeftButtonForPanning = true; // Pans by holding left mouse
         graph.setTooltips(!mxClient.IS_TOUCH);               // Disables tooltips on touch devices
+        graph.enterStopsCellEditing = true;                  // Pressing enter stops text editing in cells
+
+        // Instantiates the keyhandler
+		var keyHandler = new mxKeyHandler(graph);
+        // Sets up a handler for the event of deleting a subtree with the Delete key (keycode 46)
+        keyHandler.bindKey(46, function(evt) {
+            var cell = graph.getSelectionCell();
+            if (cell === undefined) return;
+            if (cell.getId() != 'root') DeleteSubtree(graph, cell);
+        });
 
         // When editing a cell, ensures a minimum size for legibility
         // by overriding the getPreferredSizeForCell function
