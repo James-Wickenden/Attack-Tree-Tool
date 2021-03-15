@@ -383,7 +383,7 @@ function DeleteSubtree(graph, cell) {
 
 // Performs depth-first traversal from the fixed root goal node
 function TraverseTree(graph, vertex_function) {
-    console.log("Traversing tree:\n" + vertex_function.toString());
+    //console.log("Traversing tree:\n" + vertex_function.toString());
     var root = graph.getModel().getCell('root');
     graph.traverse(root, true, vertex_function);
 };

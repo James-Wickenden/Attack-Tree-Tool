@@ -27,12 +27,13 @@
 // Starts a clienside socket connection
 var socket = io();
 
+// Parses the tree into a JS object and sends it via the socket to the server
 function EmitTree(graph) {
     var tree_data = {};
     var cells = [];
     TraverseTree(graph, function(vertex) {
         var cell = {};
-        cell.data = vertex.value;
+        cell.data = vertex.value.outerHTML;
         cell.id = vertex.id;
         cell.parent = null;
         if (vertex.source != null) cell.parent = vertex.source.id;
@@ -40,6 +41,10 @@ function EmitTree(graph) {
     });
     tree_data.cells = cells;
     tree_data.attributes = attributes;
-    console.log(tree_data);
     socket.emit('tree_data', tree_data);
 };
+
+// Catches messages from the server containing trees, and unpacks them
+socket.on('tree_data', function(msg) {
+  console.log(msg);
+});
