@@ -1,9 +1,11 @@
 'use strict';
+var g;
 
 // Parse the tree in a depth-first manner, building a list of the textual representation.
 function ParseTextually(graph) {
+    g = graph;
     var root = graph.getModel().getCell('root');
-    var graph_list = DepthFirst(root, '1.');
+    var graph_list = DepthFirst_ParseToTextual(root, '1.');
 
     //console.log(graph_list);
     return graph_list;
@@ -11,8 +13,10 @@ function ParseTextually(graph) {
 
 // Depth first algorithm that parses the tree and recursively builds a list of strings
 // Each string contains the relevant textual data for a cell.
-function DepthFirst(cell, cell_path_str) {
+// Each alternating element in the generated list is the id of the preceding cell.
+function DepthFirst_ParseToTextual(cell, cell_path_str) {
     var res = [];
+
     var cell_str = cell_path_str + '&nbsp;';
     var spacecount = "";
     for (var sp=0;sp<=cell_path_str.length;sp++) {
@@ -29,27 +33,29 @@ function DepthFirst(cell, cell_path_str) {
         cell_str += spacecount + key + ': ' + cell.getAttribute(key) + '<br>';
     }
     res.push(cell_str);
+    res.push(cell.getId());
 
     // Then, concatenate this list with the result of recursively getting a list of the child cells, and return it for depth-first recursing.
     var children = GetChildren(cell);
     for (var i = 0; i < children.length; i++) {
-        res = res.concat(DepthFirst(children[i], cell_path_str + (i + 1).toString() + '.'));
+        res = res.concat(DepthFirst_ParseToTextual(children[i], cell_path_str + (i + 1).toString() + '.'));
     }
     return res;
 };
 
 // For each cell in the graph, create a list element in the textual graph representation
 // Formatting is done with clunky innerHTML spacing but it works as a demo.
-function load_textual_graph(cells_list) {
+function Load_textual_graph(cells_list) {
     var tcl = document.getElementById('textual_cells_list');
     tcl.innerHTML = '';
 
-    for (var i = 0; i < cells_list.length; i++) {
-        var item = document.createElement('li');
-        item.style.cursor = 'pointer';
-        item.onclick = CreateTextCellButtons;
-        item.innerHTML = cells_list[i];
-        tcl.appendChild(item);
+    for (var i = 0; i < cells_list.length/2; i++) {
+        var li = document.createElement('li');
+        li.style.cursor = 'pointer';
+        li.onclick = CreateTextCellButtons;
+        li.innerHTML = cells_list[i*2];
+        li.setAttribute('name', cells_list[(i*2)+1]);
+        tcl.appendChild(li);
     }
 };
 
@@ -73,9 +79,29 @@ function CreateTextCellButtons() {
     this.appendChild(flexbox_celloptions);
 
     // Next, create the buttons for the three main operations to do on cells
-    const editButton = AddButton_List('Edit cell', null, flexbox_celloptions);
-    const addChildButton = AddButton_List('Add child', null, flexbox_celloptions);
-    const deleteButton = AddButton_List('Delete subtree', null, flexbox_celloptions);
+    const editButton = AddButton_List('Edit cell', EditCell_Textual, flexbox_celloptions);
+    const addChildButton = AddButton_List('Add child', AddChild_Textual, flexbox_celloptions);
+    const deleteButton = AddButton_List('Delete subtree', DeleteSubtree_Textual, flexbox_celloptions);
+};
+
+function EditCell_Textual(evt) {
+    evt.stopPropagation();
+    var li = evt.target.parentElement.parentElement;
+    var cell_id = li.getAttribute('name');
+};
+
+function AddChild_Textual(evt) {
+    evt.stopPropagation();
+    var li = evt.target.parentElement.parentElement;
+    var cell_id = li.getAttribute('name');
+    
+};
+
+function DeleteSubtree_Textual(evt) {
+    evt.stopPropagation();
+    var li = evt.target.parentElement.parentElement;
+    var cell_id = li.getAttribute('name');
+    DeleteSubtree(g, g.getModel().getCell(cell_id));
 };
 
 // Create a button for modifying a selected cell on the graph list.

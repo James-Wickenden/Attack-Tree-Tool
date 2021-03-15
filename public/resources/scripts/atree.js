@@ -45,7 +45,7 @@ function main(container) {
         // Overrides the graph.refresh method to also update the textual display
         var defaultRefresh = graph.refresh;
         graph.refresh = function() {
-            load_textual_graph(ParseTextually(graph));
+            Load_textual_graph(ParseTextually(graph));
             return defaultRefresh.apply(this, arguments);;
         };
 
@@ -69,7 +69,7 @@ function main(container) {
                     newValue = elt;
                 }
                 cellLabelChanged.apply(this, arguments);
-                load_textual_graph(ParseTextually(graph));
+                Load_textual_graph(ParseTextually(graph));
             };
         
         // Prevents selecting edges
@@ -312,8 +312,7 @@ function CreateContextMenu(graph, menu, cell, evt) {
     });
 
     menu.addItem('Parse Text', 'resources/img/mxgraph_images/printer.png', function() {
-        var txt = ParseTextually(graph);
-        load_textual_graph(txt);
+        Load_textual_graph(ParseTextually(graph));
     });
 
     menu.addItem('Emit Tree', 'resources/img/mxgraph_images/dot.gif', function() {
@@ -375,7 +374,6 @@ function DeleteSubtree(graph, cell) {
     // Check to see if the parent becomes a leaf; if so, remove the AND/OR overlay
     var parent = cell.getTerminal(true);
     var siblings = GetChildren(parent);
-    console.log(siblings);
     if (siblings.length == 2) {
         graph.removeCellOverlays(parent);
         AddOverlays(graph, parent);
