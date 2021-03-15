@@ -4,7 +4,7 @@ var doc;
 function main(container) {
     // Checks if browser is supported, throws an error if not.
     if (!mxClient.isBrowserSupported()) {
-        mxUtils.error('Broswer not supported', 200, false)
+        mxUtils.error('Browser not supported', 200, false)
     }
     else {
         var graph = new mxGraph(container);

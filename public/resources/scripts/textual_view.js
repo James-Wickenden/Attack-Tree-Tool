@@ -46,7 +46,47 @@ function load_textual_graph(cells_list) {
 
     for (var i = 0; i < cells_list.length; i++) {
         var item = document.createElement('li');
+        item.style.cursor = 'pointer';
+        item.onclick = function() {
+            CreateTextCellButtons(item);
+        };
         item.innerHTML = cells_list[i];
         tcl.appendChild(item);
     }
+};
+
+// When a textual list node is clicked, bring up a set of buttons for performing operations on that cell.
+function CreateTextCellButtons(item) {
+    // Look at the items children;
+    // if the operations div already exists, delete it and return to 'deselect' the cell
+    for (let i = 0; i < item.children.length; i++) {
+        if (item.children[i].getAttribute('name') == 'flex_operations') {
+            item.children[i].remove();
+            return;
+        }
+    }
+
+    // Now, we can (re)create the operations div
+    // First, create the flexbox div that contains the buttons
+    var flexbox_celloptions = document.createElement('div');
+    flexbox_celloptions.setAttribute('name', 'flex_operations');
+    flexbox_celloptions.style.display = 'flex';
+    flexbox_celloptions.style.padding = '6px';
+    item.appendChild(flexbox_celloptions);
+
+    // Next, create the buttons for the three main operations to do on cells
+    const editButton = AddButton_List('Edit cell', null, flexbox_celloptions);
+    const addChildButton = AddButton_List('Add child', null, flexbox_celloptions);
+    const deleteButton = AddButton_List('Delete subtree', null, flexbox_celloptions);
+};
+
+// Create a button for modifying a selected cell on the graph list.
+function AddButton_List(text, handler, parent) {
+    const res = document.createElement('button');
+    res.innerText = text;
+    res.style.flex = 1;
+    res.addEventListener('click', handler);
+    parent.appendChild(res);
+
+    return res;
 };
