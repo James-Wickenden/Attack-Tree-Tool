@@ -1,3 +1,9 @@
+/*
+    Handles the textual view component of the tool.
+    This includes generating the HTML list elements from a parsed graph,
+    as well as handling click events and events that update the graph.
+*/
+
 'use strict';
 
 // Parse the tree in a depth-first manner, building a list of the textual representation.

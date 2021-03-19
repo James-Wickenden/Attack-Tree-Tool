@@ -1,3 +1,8 @@
+/*
+   This form handles creating new attributes and their params.
+   Attributes are JS objects that have a name, two rules for how they are combined, and a domain eg [0,1] or [0..].
+*/
+
 "use strict";
 
 // Dictionary of the current graph attributes

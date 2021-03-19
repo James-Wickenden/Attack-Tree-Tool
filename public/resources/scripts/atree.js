@@ -1,3 +1,8 @@
+/*
+    This is the main mxgraph form that handles graph creation and mxgraph variable declaring and function overriding.
+    Cell creation, deletion, editing, overlays, and the navigator are all defined in this form.
+*/
+
 var doc;
 // TODO: replace this with a list of user-constructed objects containing default values, combination rules, name/description, etc.
 
