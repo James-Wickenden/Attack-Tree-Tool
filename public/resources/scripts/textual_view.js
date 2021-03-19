@@ -83,33 +83,37 @@ function Load_textual_graph(cells_list, graph) {
     //var selectedId = GetSelectedId(graph);
     var cellsWithOperationDivs = GetSelectedTextualCells(tcl);
     tcl.innerHTML = '';
-    
+
     // Iterates through the list of cells, creating list elements for each, and styling them
     for (var i = 0; i < cells_list.length/2; i++) {
         var li = document.createElement('li');
         var id = cells_list[(i*2)+1]
         li.style.cursor = 'pointer';
-        li.onclick = function() { CreateTextCellButtons(this, graph); };
+        li.onclick = function() { CreateTextCellButtons(this, id, graph); };
         li.innerHTML = cells_list[i*2];
         li.setAttribute('name', id);
         //if (id == selectedId) li.style.border = '1px solid darkblue';
-        if (cellsWithOperationDivs.includes(id)) CreateTextCellButtons(li, graph);
+        if (cellsWithOperationDivs.includes(id)) CreateTextCellButtons(li, id, graph);
 
         tcl.appendChild(li);
     }
 };
 
+function RemoveFlexOperations(li, graph) {
+    for (let i = 0; i < li.children.length; i++) {
+            if (li.children[i].getAttribute('name') == 'flex_operations') {
+                li.children[i].remove();
+                graph.setSelectionCells([]);
+                return;
+            }
+        }
+};
+
 // When a textual list node is clicked, bring up a set of buttons for performing operations on that cell.
-function CreateTextCellButtons(li, graph) {
+function CreateTextCellButtons(li, id, graph) {
     // Look at the items children;
     // if the operations div already exists, delete it and return to 'deselect' the cell
-    for (let i = 0; i < li.children.length; i++) {
-        if (li.children[i].getAttribute('name') == 'flex_operations') {
-            li.children[i].remove();
-            graph.setSelectionCells([]);
-            return;
-        }
-    }
+    RemoveFlexOperations(li, graph);
 
     // Now, we can (re)create the operations div
     // First, create the flexbox div that contains the buttons
@@ -120,9 +124,9 @@ function CreateTextCellButtons(li, graph) {
     li.appendChild(flexbox_celloptions);
 
     // Next, create the buttons for the three main operations to do on cells
-    const editButton = AddButton_List('Edit cell', EditCell_Textual, flexbox_celloptions, graph);
-    const addChildButton = AddButton_List('Add child', AddChild_Textual, flexbox_celloptions, graph);
-    const deleteButton = AddButton_List('Delete subtree', DeleteSubtree_Textual, flexbox_celloptions, graph);
+    const editButton = AddButton_List('Edit cell', id + '_edit', EditCell_Textual, flexbox_celloptions, graph);
+    const addChildButton = AddButton_List('Add child', id + '_addChild', AddChild_Textual, flexbox_celloptions, graph);
+    const deleteButton = AddButton_List('Delete subtree', id + '_delete', DeleteSubtree_Textual, flexbox_celloptions, graph);
 
     if (li.getAttribute('name') == 'root') DisableButton(deleteButton);
 
@@ -148,6 +152,7 @@ function EditCell_Textual(evt, graph) {
     evt.stopPropagation();
     var li = evt.target.parentElement.parentElement;
     var cell = GetCellFromLi(li, graph);
+    TurnListIntoEditableForm(li, cell, graph);
 };
 
 // Add a child from the list view.
@@ -166,10 +171,114 @@ function DeleteSubtree_Textual(evt, graph) {
     DeleteSubtree(graph, cell);
 };
 
+// When editing, replace the list element with an interactive form to edit cell parameters.
+// The cell label, AND/OR typing, and each attribute can be edited.
+// Options should be hidden if not editable; for example, non-leaf attributes or AND/OR values for cells with <2 children.
+function TurnListIntoEditableForm(li, cell, graph) {
+    var li_HTML_old = li.innerHTML;
+    
+    // First, we create the form element and empty the list element HTML.
+    // A linebreak is used to clone later on to save redefining it again and again.
+    li.innerHTML = '';
+    var cellForm = document.createElement('form');
+    var br = document.createElement("br"); 
+    
+    cellForm.addEventListener('click', function(evt) { evt.stopPropagation(); });
+    //li.style.cursor = 'default';
+    //li.onclick = function(){};
+    cellForm.style.cursor = 'default';
+    cellForm.setAttribute('name','cellForm');
+
+    // The textual path is gotten from the list element text and used to help the user identify the node being changed.
+    // This is added to the form as a label.
+    var cellForm_Path = document.createElement('label');
+    cellForm_Path.innerHTML = li_HTML_old.split('&')[0] + '&nbsp;';
+    cellForm.appendChild(cellForm_Path);
+
+    // Next, add an input node to change the cell's text label.
+    // The current label is used as a placeholder.
+    var cellForm_Name = document.createElement('input');
+    cellForm_Name.placeholder = cell.getAttribute('label');
+    cellForm_Name.setAttribute('name', 'cellForm_Name');
+    cellForm.appendChild(cellForm_Name);
+    cellForm.innerHTML += '&nbsp;';
+
+    // If the node has >=2 children, add a combobox to edit this value.
+    // This is located right where it is represented textually to create a mental map for the user.
+    if (GetChildren(cell).length >= 2) {
+        var cellForm_ANDOR = document.createElement('select');
+        var andOption = document.createElement('option');
+        var orOption = document.createElement('option');
+        andOption.text = 'AND';
+        orOption.text = 'OR';
+        cellForm_ANDOR.add(andOption);
+        cellForm_ANDOR.add(orOption);
+        cellForm_ANDOR.style.cursor = 'pointer';
+        cellForm_ANDOR.setAttribute('name', 'cellForm_ANDOR');
+
+        cellForm.appendChild(cellForm_ANDOR);
+    }
+
+    cellForm.appendChild(br.cloneNode());
+
+    // For each attribute, create a label and input pair of nodes to change them.
+    // I tried to introduce aligning for simplicity with flexboxes but this code became illegible fast...
+    for (var key in attributes) {
+        var cellForm_Attr_lbl = document.createElement('label');
+        var cellForm_Attr_txt = document.createElement('input');
+
+        cellForm_Attr_lbl.innerHTML = key + ':&nbsp;';
+        cellForm_Attr_lbl.style.marginLeft = '10%';
+        
+        cellForm_Attr_txt.placeholder = cell.getAttribute(key);
+        cellForm_Attr_txt.style.marginTop = '8px';
+        cellForm_Attr_txt.setAttribute('name', 'cellForm_' + key);
+
+        cellForm.appendChild(cellForm_Attr_lbl);
+        cellForm.appendChild(cellForm_Attr_txt);
+        cellForm.appendChild(br.cloneNode());
+    }
+
+    // Add a submit and cancel button to navigate out of the form
+    var cellForm_submit = document.createElement('input');
+    cellForm_submit.setAttribute('type', 'submit');
+    cellForm_submit.setAttribute('value', 'Update Cell');
+    cellForm_submit.style.cursor = 'pointer';
+    cellForm_submit.style.marginTop = '6px';
+    cellForm_submit.addEventListener('click', function(evt) {
+        evt.preventDefault();
+        console.log("submitted!");
+    });
+    cellForm.appendChild(cellForm_submit);
+
+    var cellForm_cancel = document.createElement('input');
+    cellForm_cancel.setAttribute('type', 'submit');
+    cellForm_cancel.setAttribute('value', 'Cancel Changes');
+    cellForm_cancel.style.cursor = 'pointer';
+    cellForm_cancel.style.marginTop = '6px';
+    cellForm_cancel.style.marginLeft = '6px';
+    cellForm_cancel.addEventListener('click', function(evt) {
+        evt.preventDefault();
+        li.innerHTML = li_HTML_old;
+        var cell_id = li.getAttribute('name');
+        RemoveFlexOperations(li, graph);
+        CreateTextCellButtons(li, cell_id, graph);
+        //li.style.cursor = 'pointer';
+        //li.onclick = function() { CreateTextCellButtons(this, cell_id, graph); };
+        return;
+    });
+    cellForm.appendChild(cellForm_cancel);
+
+    // Finally, render the form in the list element.
+    li.appendChild(cellForm); 
+    console.log(li.innerHTML);
+};
+
 // Create a button for modifying a selected cell on the graph list.
-function AddButton_List(text, handler, parent, graph) {
+function AddButton_List(text, id, handler, parent, graph) {
     const res = document.createElement('button');
     res.innerText = text;
+    res.setAttribute('name', id);
     res.style.flex = 1;
     res.style.marginLeft = '6px';
     res.style.marginRight = '6px';

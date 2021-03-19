@@ -51,7 +51,7 @@ function main(container) {
         var defaultRefresh = graph.refresh;
         graph.refresh = function() {
             Load_textual_graph(ParseTextually(graph), graph);
-            return defaultRefresh.apply(this, arguments);;
+            return defaultRefresh.apply(this, arguments);
         };
 
         // Renders the label attribute on nodes
@@ -112,7 +112,7 @@ function main(container) {
         graph.cellRenderer.getLabelValue = function(state) {
             if (!state.view.graph.getModel().isVertex(state.cell)) return;
 			var result = state.cell.getAttribute('label');
-
+            result += '\n' + state.cell.getId();
             if (cur_attribute_index == -1) {
                 for (var key in attributes) {
                     result += '\n' + key + ':' + state.cell.getAttribute(key); 
