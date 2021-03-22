@@ -101,19 +101,20 @@ function Load_textual_graph(cells_list, graph) {
 
 function RemoveFlexOperations(li, graph) {
     for (let i = 0; i < li.children.length; i++) {
-            if (li.children[i].getAttribute('name') == 'flex_operations') {
-                li.children[i].remove();
-                graph.setSelectionCells([]);
-                return;
-            }
+        if (li.children[i].getAttribute('name') == 'flex_operations') {
+            li.children[i].remove();
+            graph.setSelectionCells([]);
+            return true;
         }
+    }
+    return false;
 };
 
 // When a textual list node is clicked, bring up a set of buttons for performing operations on that cell.
 function CreateTextCellButtons(li, id, graph) {
     // Look at the items children;
     // if the operations div already exists, delete it and return to 'deselect' the cell
-    RemoveFlexOperations(li, graph);
+    if (RemoveFlexOperations(li, graph)) return;
 
     // Now, we can (re)create the operations div
     // First, create the flexbox div that contains the buttons
@@ -223,6 +224,7 @@ function TurnListIntoEditableForm(li, cell, graph) {
 
     // For each attribute, create a label and input pair of nodes to change them.
     // I tried to introduce aligning for simplicity with flexboxes but this code became illegible fast...
+    var children = GetChildren(cell);
     for (var key in attributes) {
         var cellForm_Attr_lbl = document.createElement('label');
         var cellForm_Attr_txt = document.createElement('input');
@@ -233,6 +235,7 @@ function TurnListIntoEditableForm(li, cell, graph) {
         cellForm_Attr_txt.placeholder = cell.getAttribute(key);
         cellForm_Attr_txt.style.marginTop = '8px';
         cellForm_Attr_txt.setAttribute('name', 'cellForm_' + key);
+        if (children.length > 0) cellForm_Attr_txt.disabled = true;
 
         cellForm.appendChild(cellForm_Attr_lbl);
         cellForm.appendChild(cellForm_Attr_txt);
