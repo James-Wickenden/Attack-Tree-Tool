@@ -185,8 +185,9 @@ function TurnListIntoEditableForm(li, cell, graph) {
     var br = document.createElement("br"); 
     
     cellForm.addEventListener('click', function(evt) { evt.stopPropagation(); });
-    //li.style.cursor = 'default';
-    //li.onclick = function(){};
+    // You can still click on the list element padding, so the click handler is temporarily disabled.
+    li.style.cursor = 'default';
+    li.onclick = function(){return;};
     cellForm.style.cursor = 'default';
     cellForm.setAttribute('name','cellForm');
 
@@ -245,6 +246,7 @@ function TurnListIntoEditableForm(li, cell, graph) {
     }
 
     // Add a submit and cancel button to navigate out of the form
+    // On clicking either, we must also restore the li onclick handler.
     var cellForm_submit = document.createElement('input');
     cellForm_submit.setAttribute('type', 'submit');
     cellForm_submit.setAttribute('value', 'Update Cell');
@@ -253,6 +255,8 @@ function TurnListIntoEditableForm(li, cell, graph) {
     cellForm_submit.addEventListener('click', function(evt) {
         evt.preventDefault();
         HandleFormSubmit(cellForm, graph, cell, childCount);
+        li.style.cursor = 'pointer';
+        li.onclick = function() { CreateTextCellButtons(this, cell_id, graph); };
         return false;
     });
     cellForm.appendChild(cellForm_submit);
@@ -269,8 +273,8 @@ function TurnListIntoEditableForm(li, cell, graph) {
         var cell_id = li.getAttribute('name');
         RemoveFlexOperations(li, graph);
         CreateTextCellButtons(li, cell_id, graph);
-        //li.style.cursor = 'pointer';
-        //li.onclick = function() { CreateTextCellButtons(this, cell_id, graph); };
+        li.style.cursor = 'pointer';
+        li.onclick = function() { CreateTextCellButtons(this, cell_id, graph); };
         return;
     });
     cellForm.appendChild(cellForm_cancel);
@@ -280,6 +284,8 @@ function TurnListIntoEditableForm(li, cell, graph) {
     console.log(li.innerHTML);
 };
 
+// Called when the 'Updaate Cell' button is clicked.
+// Handles updating the graph model, including propagating and refreshing the graph.
 function HandleFormSubmit(cellForm, graph, cell, childCount) {
     // First, build a dictionary for easy access to the form responses.
     // Dictionary keys are the names given to the form elements as defined above.

@@ -413,6 +413,7 @@ function EditAttribute(graph, cell, attributeName) {
     graph.refresh();
 };
 
+// Given a new attribute value, use the given attribute domain to determine whether its valid or not.
 function NewAttributeIsValid(newValue, attribute) {
     if (newValue === null || isNaN(newValue) || newValue > attribute.max_val || newValue < attribute.min_val) return false;
     return true;
