@@ -406,11 +406,16 @@ function TraverseTree(graph, vertex_function) {
 function EditAttribute(graph, cell, attributeName) {
     var attr = attributes[attributeName];
     var newValue = parseFloat(prompt("Enter new " + attributeName + " value for cell:", 0));
-    if (newValue === null || isNaN(newValue) || newValue > attr.max_val || newValue < attr.min_val) newValue = attr.default_val;
+    if (!NewAttributeIsValid(newValue, attr)) newValue = attr.default_val;
     cell.setAttribute(attributeName, newValue);
 
     PropagateChangeUpTree(graph, cell, attr);
     graph.refresh();
+};
+
+function NewAttributeIsValid(newValue, attribute) {
+    if (newValue === null || isNaN(newValue) || newValue > attribute.max_val || newValue < attribute.min_val) return false;
+    return true;
 };
 
 // When an attribute is edited or a child is added or deleted,

@@ -212,9 +212,11 @@ function TurnListIntoEditableForm(li, cell, graph) {
         var orOption = document.createElement('option');
         andOption.text = 'AND';
         orOption.text = 'OR';
+        
         cellForm_ANDOR.add(andOption);
         cellForm_ANDOR.add(orOption);
         cellForm_ANDOR.style.cursor = 'pointer';
+        cellForm_ANDOR.value = cell.getAttribute('nodetype');
         cellForm_ANDOR.setAttribute('name', 'cellForm_ANDOR');
 
         cellForm.appendChild(cellForm_ANDOR);
@@ -224,7 +226,7 @@ function TurnListIntoEditableForm(li, cell, graph) {
 
     // For each attribute, create a label and input pair of nodes to change them.
     // I tried to introduce aligning for simplicity with flexboxes but this code became illegible fast...
-    var children = GetChildren(cell);
+    var childCount = GetChildren(cell).length;
     for (var key in attributes) {
         var cellForm_Attr_lbl = document.createElement('label');
         var cellForm_Attr_txt = document.createElement('input');
@@ -235,7 +237,7 @@ function TurnListIntoEditableForm(li, cell, graph) {
         cellForm_Attr_txt.placeholder = cell.getAttribute(key);
         cellForm_Attr_txt.style.marginTop = '8px';
         cellForm_Attr_txt.setAttribute('name', 'cellForm_' + key);
-        if (children.length > 0) cellForm_Attr_txt.disabled = true;
+        if (childCount > 0) cellForm_Attr_txt.disabled = true;
 
         cellForm.appendChild(cellForm_Attr_lbl);
         cellForm.appendChild(cellForm_Attr_txt);
@@ -250,7 +252,8 @@ function TurnListIntoEditableForm(li, cell, graph) {
     cellForm_submit.style.marginTop = '6px';
     cellForm_submit.addEventListener('click', function(evt) {
         evt.preventDefault();
-        console.log("submitted!");
+        HandleFormSubmit(cellForm, graph, cell, childCount);
+        return false;
     });
     cellForm.appendChild(cellForm_submit);
 
@@ -275,6 +278,39 @@ function TurnListIntoEditableForm(li, cell, graph) {
     // Finally, render the form in the list element.
     li.appendChild(cellForm); 
     console.log(li.innerHTML);
+};
+
+function HandleFormSubmit(cellForm, graph, cell, childCount) {
+    // First, build a dictionary for easy access to the form responses.
+    // Dictionary keys are the names given to the form elements as defined above.
+    var formInputs = {};
+    for (var i = 0; i < cellForm.children.length; i++) {
+        var childName = cellForm.children[i].getAttribute('name');
+        if (childName != null) formInputs[childName] = cellForm.children[i];
+    }
+    
+    // Update the form name. More validation here may be required, e.g. to prevent XML escaping.
+    var newCellLabel = formInputs['cellForm_Name'].value;
+    if (newCellLabel != '') cell.setAttribute('label', newCellLabel);
+
+    // If a leaf node, update the attributes.
+    // Each attribute should be checked to see if its valid for that attribute; ie within the attribute domain.
+    if (childCount == 0) {
+        for (var key in attributes) {
+            var newAttrValue = parseFloat(formInputs['cellForm_' + key].value);
+            if (!NewAttributeIsValid(newAttrValue, attributes[key])) continue;
+            console.log(newAttrValue);
+            cell.setAttribute(key, newAttrValue);
+            PropagateChangeUpTree(graph, cell, attributes[key]);
+        }
+    }
+    else if (childCount >= 2) {
+        var newCellANDOR = formInputs['cellForm_ANDOR'].value;
+        cell.setAttribute('nodetype', newCellANDOR);
+        Add_AND_OR_Overlay(graph, cell);
+    }
+
+    graph.refresh();
 };
 
 // Create a button for modifying a selected cell on the graph list.
