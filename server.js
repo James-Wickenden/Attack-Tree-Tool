@@ -45,6 +45,10 @@ function setup_socket_io() {
       console.log(msg);
       io.emit('tree_data', msg);
     });
+    socket.on('chat message', (msg) => {
+      console.log(msg);
+      io.emit('chat message', msg);
+    });
   });
 
   //io.emit('some event', { someProperty: 'some value', otherProperty: 'other value' }); // This will emit the event to all connected sockets

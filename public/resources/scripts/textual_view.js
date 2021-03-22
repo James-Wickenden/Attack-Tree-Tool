@@ -280,8 +280,7 @@ function TurnListIntoEditableForm(li, cell, graph) {
     cellForm.appendChild(cellForm_cancel);
 
     // Finally, render the form in the list element.
-    li.appendChild(cellForm); 
-    console.log(li.innerHTML);
+    li.appendChild(cellForm);
 };
 
 // Called when the 'Updaate Cell' button is clicked.
@@ -305,7 +304,6 @@ function HandleFormSubmit(cellForm, graph, cell, childCount) {
         for (var key in attributes) {
             var newAttrValue = parseFloat(formInputs['cellForm_' + key].value);
             if (!NewAttributeIsValid(newAttrValue, attributes[key])) continue;
-            console.log(newAttrValue);
             cell.setAttribute(key, newAttrValue);
             PropagateChangeUpTree(graph, cell, attributes[key]);
         }
