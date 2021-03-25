@@ -13,14 +13,14 @@ html, body {
 }
 
 #graphContainer {
-    flex: 3;
+    flex: 3 0 0;
     background-color: beige;
     border: 1px solid black;
     margin-right: 20px;
 }
 
 #textContainer {
-    flex: 2;
+    flex: 2 0 auto;
     background-color: white;
     border: 1px solid black;
 }

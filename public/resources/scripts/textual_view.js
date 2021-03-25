@@ -23,14 +23,14 @@ function DepthFirst_ParseToTextual(cell, cell_path_str) {
 
     var cell_str = cell_path_str + '&nbsp;';
     var spacecount = "";
-    for (var sp=0;sp<=cell_path_str.length;sp++) {
+    for (var sp = 0; sp <= cell_path_str.length; sp++) {
         spacecount += '&nbsp;';
     }
 
     // Build the string textually representing each cell:
     // The numerical representation of the cell's location in the tree, the cell label, the AND/OR label (if a parent to 2+ cells), and the attributes.
     cell_str += cell.getAttribute('label');
-    if (GetChildren(cell).length >=2) cell_str += ' (' + cell.getAttribute('nodetype') + ')';
+    if (GetChildren(cell).length >= 2) cell_str += ' (' + cell.getAttribute('nodetype') + ')';
     cell_str += '<br>';
 
     for (var key in attributes) {
@@ -85,12 +85,12 @@ function Load_textual_graph(cells_list, graph) {
     tcl.innerHTML = '';
 
     // Iterates through the list of cells, creating list elements for each, and styling them
-    for (var i = 0; i < cells_list.length/2; i++) {
+    for (var i = 0; i < cells_list.length / 2; i++) {
         var li = document.createElement('li');
-        var id = cells_list[(i*2)+1]
+        var id = cells_list[(i * 2) + 1]
         li.style.cursor = 'pointer';
-        li.onclick = function() { CreateTextCellButtons(this, id, graph); };
-        li.innerHTML = cells_list[i*2];
+        li.onclick = function () { CreateTextCellButtons(this, id, graph); };
+        li.innerHTML = cells_list[i * 2];
         li.setAttribute('name', id);
         //if (id == selectedId) li.style.border = '1px solid darkblue';
         if (cellsWithOperationDivs.includes(id)) CreateTextCellButtons(li, id, graph);
@@ -177,19 +177,19 @@ function DeleteSubtree_Textual(evt, graph) {
 // Options should be hidden if not editable; for example, non-leaf attributes or AND/OR values for cells with <2 children.
 function TurnListIntoEditableForm(li, cell, graph) {
     var li_HTML_old = li.innerHTML;
-    
+
     // First, we create the form element and empty the list element HTML.
     // A linebreak is used to clone later on to save redefining it again and again.
     li.innerHTML = '';
     var cellForm = document.createElement('form');
-    var br = document.createElement("br"); 
-    
-    cellForm.addEventListener('click', function(evt) { evt.stopPropagation(); });
+    var br = document.createElement("br");
+
+    cellForm.addEventListener('click', function (evt) { evt.stopPropagation(); });
     // You can still click on the list element padding, so the click handler is temporarily disabled.
     li.style.cursor = 'default';
-    li.onclick = function(){return;};
+    li.onclick = function () { return; };
     cellForm.style.cursor = 'default';
-    cellForm.setAttribute('name','cellForm');
+    cellForm.setAttribute('name', 'cellForm');
 
     // The textual path is gotten from the list element text and used to help the user identify the node being changed.
     // This is added to the form as a label.
@@ -213,7 +213,7 @@ function TurnListIntoEditableForm(li, cell, graph) {
         var orOption = document.createElement('option');
         andOption.text = 'AND';
         orOption.text = 'OR';
-        
+
         cellForm_ANDOR.add(andOption);
         cellForm_ANDOR.add(orOption);
         cellForm_ANDOR.style.cursor = 'pointer';
@@ -234,7 +234,7 @@ function TurnListIntoEditableForm(li, cell, graph) {
 
         cellForm_Attr_lbl.innerHTML = key + ':&nbsp;';
         cellForm_Attr_lbl.style.marginLeft = '10%';
-        
+
         cellForm_Attr_txt.placeholder = cell.getAttribute(key);
         cellForm_Attr_txt.style.marginTop = '8px';
         cellForm_Attr_txt.setAttribute('name', 'cellForm_' + key);
@@ -252,11 +252,11 @@ function TurnListIntoEditableForm(li, cell, graph) {
     cellForm_submit.setAttribute('value', 'Update Cell');
     cellForm_submit.style.cursor = 'pointer';
     cellForm_submit.style.marginTop = '6px';
-    cellForm_submit.addEventListener('click', function(evt) {
+    cellForm_submit.addEventListener('click', function (evt) {
         evt.preventDefault();
         HandleFormSubmit(cellForm, graph, cell, childCount);
         li.style.cursor = 'pointer';
-        li.onclick = function() { CreateTextCellButtons(this, cell_id, graph); };
+        li.onclick = function () { CreateTextCellButtons(this, cell_id, graph); };
         return false;
     });
     cellForm.appendChild(cellForm_submit);
@@ -267,14 +267,14 @@ function TurnListIntoEditableForm(li, cell, graph) {
     cellForm_cancel.style.cursor = 'pointer';
     cellForm_cancel.style.marginTop = '6px';
     cellForm_cancel.style.marginLeft = '6px';
-    cellForm_cancel.addEventListener('click', function(evt) {
+    cellForm_cancel.addEventListener('click', function (evt) {
         evt.preventDefault();
         li.innerHTML = li_HTML_old;
         var cell_id = li.getAttribute('name');
         RemoveFlexOperations(li, graph);
         CreateTextCellButtons(li, cell_id, graph);
         li.style.cursor = 'pointer';
-        li.onclick = function() { CreateTextCellButtons(this, cell_id, graph); };
+        li.onclick = function () { CreateTextCellButtons(this, cell_id, graph); };
         return;
     });
     cellForm.appendChild(cellForm_cancel);
@@ -293,7 +293,7 @@ function HandleFormSubmit(cellForm, graph, cell, childCount) {
         var childName = cellForm.children[i].getAttribute('name');
         if (childName != null) formInputs[childName] = cellForm.children[i];
     }
-    
+
     // Update the form name. More validation here may be required, e.g. to prevent XML escaping.
     var newCellLabel = formInputs['cellForm_Name'].value;
     if (newCellLabel != '') cell.setAttribute('label', newCellLabel);
@@ -328,7 +328,7 @@ function AddButton_List(text, id, handler, parent, graph) {
     res.style.cursor = 'pointer';
     res.style.backgroundColor = 'darkblue';
     res.style.color = 'white';
-    res.addEventListener('click', function(evt) { handler(evt, graph); });
+    res.addEventListener('click', function (evt) { handler(evt, graph); });
     parent.appendChild(res);
 
     return res;
