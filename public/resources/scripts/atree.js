@@ -194,7 +194,7 @@ function AddOverlays(graph, cell) {
     // Draw the button to create a new child for that node
     var overlay_addchild = new mxCellOverlay(new mxImage('resources/img/mxgraph_images/add.png', 24, 24), 'Add Child');
     overlay_addchild.cursor = 'hand';
-    overlay_addchild.align = mxConstants.ALIGN_CENTER;
+    overlay_addchild.align = mxConstants.ALIGN_RIGHT;
     overlay_addchild.verticalAlign = mxConstants.ALIGN_BOTTOM;
     overlay_addchild.addListener(mxEvent.CLICK, mxUtils.bind(this, function(sender, evt) {
         AddChild(graph, cell);
@@ -204,7 +204,7 @@ function AddOverlays(graph, cell) {
 
     // Draw the button to delete that node
     // The root node must never be deleted, thus the extra case is needed.
-    if (!cell.getTerminal(true) === null) {
+    if (cell.getId() != 'root') {
         var overlay_delete = new mxCellOverlay(new mxImage('resources/img/mxgraph_images/close.png', 30, 30), 'Delete');
         overlay_delete.cursor = 'hand';
         overlay_delete.offset = new mxPoint(-4, 8);
@@ -351,12 +351,12 @@ function AddChild(graph, cell) {
         var edge = graph.insertEdge(parent, null, '', cell, newnode);
         newnode.setTerminal(cell, true);
         
+        // If needed, add a graphical AND/OR overlay to the parent
         if (GetChildren(cell).length > 1) Add_AND_OR_Overlay(graph, cell);
         AddOverlays(graph, newnode);
 
         // Any tree attributes need to be added
         // the new child will be a leaf by definition, so we can assign default values
-        // TODO: set the parent [cell] to no longer render using default values?
         for (var key in attributes) {
             var attr = attributes[key];
             xmlnode.setAttribute(attr.name, attr.default_val);
