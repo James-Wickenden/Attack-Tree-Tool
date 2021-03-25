@@ -27,6 +27,10 @@ function EmitTree(graph) {
 };
 
 // Catches messages from the server containing trees, and unpacks them
-socket.on('tree_data', function(msg) {
-  console.log(msg);
+socket.on('tree_data', function(data) {
+  var graph = ReturnGraph();
+  var cells = data.cells;
+  
+  console.log(cells);
+  attributes = data.attributes;
 });

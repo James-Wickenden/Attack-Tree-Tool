@@ -150,9 +150,14 @@ function main(container) {
         }
 
         AddNavigator(container, graph);
+        ReturnGraph = function() { return graph; };
         graph.refresh();
     }
 };
+
+// A function to return the graph for local functions to not require global variables.
+// This is redefined above within the scope of var graph.
+function ReturnGraph() { return null; };
 
 // Adds a navigator to scroll through attributes.
 // TODO: add another fixed toolbar in another div with overarching functionality eg attribute control, XML/Yaml handling, File controls etc.
