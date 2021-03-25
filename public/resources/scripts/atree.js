@@ -262,7 +262,7 @@ function CreateContextMenu(graph, menu, cell, evt) {
                     DeleteSubtree(graph, cell);
                 });
             }
-
+            /*
             // Edit attributes of the cell;
             // will need to reference and edit the active attribute once attribute navigation is added.
             if (GetChildren(cell).length == 0) {
@@ -273,9 +273,9 @@ function CreateContextMenu(graph, menu, cell, evt) {
                     EditAttribute(graph, cell, 'probability');
                 });
             }
-
+            */
             // Print the cell's children to the console. Used for debug.
-            menu.addItem('Get Children', 'resources/img/mxgraph_images/connector.gif', function () {
+            menu.addItem('Get Children (DEBUG)', 'resources/img/mxgraph_images/connector.gif', function () {
                 console.log(GetChildren(cell));
             });
 
@@ -294,7 +294,7 @@ function CreateContextMenu(graph, menu, cell, evt) {
                     graph.refresh();
                 });
             }
-
+            /*
             // Only show the option to propagate on leaf cells
             // Propgate an attribute and its changes up the tree to the root, from the selected node.
             // This is for debug purposes; propagation should happen automatically after each graph update:
@@ -309,7 +309,7 @@ function CreateContextMenu(graph, menu, cell, evt) {
                     graph.refresh();
                 });
             }
-
+            */
             menu.addSeparator();
         }
     }
@@ -323,19 +323,15 @@ function CreateContextMenu(graph, menu, cell, evt) {
         graph.zoomOut();
     });
 
-    menu.addItem('Add cost', 'resources/img/mxgraph_images/navigate_plus.png', function () {
-        //AddAttribute(graph);
-    });
-
-    menu.addItem('Traverse', 'resources/img/mxgraph_images/redo.png', function () {
+    menu.addItem('Traverse (DEBUG)', 'resources/img/mxgraph_images/redo.png', function () {
         TraverseTree(graph, function (vertex) { console.log(vertex); });
     });
 
-    menu.addItem('Parse Text', 'resources/img/mxgraph_images/printer.png', function () {
-        Load_textual_graph(ParseTextually(graph), graph);
+    menu.addItem('List Attributes (DEBUG)', 'resources/img/mxgraph_images/key.png', function () {
+        console.log(attributes);
     });
 
-    menu.addItem('Emit Tree', 'resources/img/mxgraph_images/dot.gif', function () {
+    menu.addItem('Emit Tree (DEBUG)', 'resources/img/mxgraph_images/dot.gif', function () {
         EmitTree(graph);
     });
 };
