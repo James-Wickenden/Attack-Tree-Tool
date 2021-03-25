@@ -32,7 +32,6 @@ function EmitTree(graph) {
         tree_data.attributes[key].AND_rule = attributes[key].AND_rule.toString();
         tree_data.attributes[key].OR_rule = attributes[key].OR_rule.toString();
     }
-    console.log(tree_data.attributes);
     socket.emit('tree_data', tree_data);
 };
 
@@ -59,8 +58,9 @@ function UpdateGraphCells(graph, cells) {
         for (var i = 1; i < cells.length; i++) {
             var parentCell = graph.getModel().getCell(cells[i].parent);
             var xmlnode = GetXMLNode(cells[i].data);
-            var newnode = graph.insertVertex(defaultParent, null, xmlnode);
-
+            var newnode = graph.insertVertex(defaultParent, cells[i].id, xmlnode);
+            console.log(cells);
+            console.log(graph.getModel());
             // Updates the geometry of the vertex with the preferred size computed in the graph
             var geometry = graph.getModel().getGeometry(newnode);
             var size = graph.getPreferredSizeForCell(newnode);

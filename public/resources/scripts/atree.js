@@ -75,6 +75,7 @@ function main(container) {
             }
             cellLabelChanged.apply(this, arguments);
             Load_textual_graph(ParseTextually(graph), graph);
+            EmitTree(graph);
         };
 
         // Prevents selecting edges
@@ -291,6 +292,8 @@ function CreateContextMenu(graph, menu, cell, evt) {
                     for (var key in attributes) {
                         PropagateChangeUpTree(graph, cell, attributes[key]);
                     }
+
+                    EmitTree(graph);
                     graph.refresh();
                 });
             }
@@ -375,6 +378,7 @@ function AddChild(graph, cell) {
     finally {
         graph.getModel().endUpdate();
     }
+    EmitTree(graph);
 };
 
 // Delete the subtree with cell as its root
@@ -403,6 +407,7 @@ function DeleteSubtree(graph, cell) {
         PropagateChangeUpTree(graph, parent, attr);
     }
     graph.refresh();
+    EmitTree(graph);
 };
 
 // Performs depth-first traversal from the fixed root goal node
@@ -426,6 +431,7 @@ function EditAttribute(graph, cell, attributeName) {
     }
 
     PropagateChangeUpTree(graph, cell, attr);
+    EmitTree(graph);
     graph.refresh();
 };
 
