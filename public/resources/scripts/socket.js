@@ -27,11 +27,12 @@ function EmitTree(graph) {
         cells.push(cell);
     });
     tree_data.cells = cells;
-    tree_data.attributes = attributes;
+    tree_data.attributes = JSON.parse(JSON.stringify(attributes));
     for (var key in tree_data.attributes) {
-      tree_data.attributes[key].AND_rule = tree_data.attributes[key].AND_rule.toString();
-      tree_data.attributes[key].OR_rule = tree_data.attributes[key].OR_rule.toString();
+      tree_data.attributes[key].AND_rule = attributes[key].AND_rule.toString();
+      tree_data.attributes[key].OR_rule = attributes[key].OR_rule.toString();
     }
+    console.log(tree_data.attributes);
     socket.emit('tree_data', tree_data);
 };
 
@@ -53,7 +54,7 @@ function UpdateGraphCells(graph, cells) {
   graph.getModel().beginUpdate();
   try {
     // The root node must be re-added first and separately to preserve tree structure.
-    graph.insertVertex(defaultParent, 'root', GetXMLNode(cells[0].data), graph.container.offsetWidth / 3, 20, 140, 60);
+    graph.insertVertex(defaultParent, 'root', GetXMLNode(cells[0].data), graph.container.offsetWidth / 3, 20, 140, 70);
     
     for (var i = 1; i < cells.length; i++) {
       var parentCell = graph.getModel().getCell(cells[i].parent);
@@ -86,11 +87,15 @@ function UpdateGraphCells(graph, cells) {
 // Complexity here comes from socket.io not packing functions into the JS objects it sends.
 // The workaround used here is to transmit attribute rules as strings, then rebuild them here as below.
 function UpdateGraphAttributes(newAttributes) {
+  console.log(newAttributes);
+  console.log(attributes);
   for (var key in newAttributes) {
     newAttributes[key].AND_rule = new Function('return ' + newAttributes[key].AND_rule)();
     newAttributes[key].OR_rule = new Function('return ' + newAttributes[key].OR_rule)();
   }
-  attributes = newAttributes;
+  console.log(attributes);
+  attributes = JSON.parse(JSON.stringify(newAttributes));
+  console.log(attributes);
 };
 
 // Catches messages from the server containing trees, and unpacks them

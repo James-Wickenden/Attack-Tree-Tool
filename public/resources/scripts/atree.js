@@ -41,8 +41,8 @@ function main(container) {
         graph.getPreferredSizeForCell = function(cell) {
             var result = oldGetPreferredSizeForCell.apply(this, arguments);
             if (result != null) {
-                result.width = Math.max(120, result.width - 40);
-                result.height = Math.max(60, result.height - 40);
+                result.width = Math.max(140, result.width - 40);
+                result.height = Math.max(70, result.height - 40);
             }
             return result;
         };
@@ -141,7 +141,7 @@ function main(container) {
                 rootxml.setAttribute(attr.name, attr.default_val);
             }
 
-            var root = graph.insertVertex(parent, 'root', rootxml, w / 3, 20, 140, 60);
+            var root = graph.insertVertex(parent, 'root', rootxml, w / 3, 20, 140, 70);
             graph.updateCellSize(root);
             AddOverlays(graph, root);
         }
