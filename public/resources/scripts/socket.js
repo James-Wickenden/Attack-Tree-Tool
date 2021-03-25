@@ -28,9 +28,14 @@ function EmitTree(graph) {
     });
     tree_data.cells = cells;
     tree_data.attributes = attributes;
+    for (var key in tree_data.attributes) {
+      tree_data.attributes[key].AND_rule = tree_data.attributes[key].AND_rule.toString();
+      tree_data.attributes[key].OR_rule = tree_data.attributes[key].OR_rule.toString();
+    }
     socket.emit('tree_data', tree_data);
 };
 
+// Iterates through the data dictionary built in the EmitTree function and defines and xmlnode and sets values accordingly.
 function GetXMLNode(data) {
   var xmlnode = doc.createElement('cell');
   for (var key in data) {
@@ -39,8 +44,9 @@ function GetXMLNode(data) {
   return xmlnode;
 };
 
+// Wipes the graph of all cells, then rebuilds it from scratch with the cells received from socket.io
+// This is not efficient in any way, but should reduce complexity enough for an effective implementation.
 function UpdateGraphCells(graph, cells) {
-  console.log(cells);
   graph.removeCells(graph.getChildVertices(graph.getDefaultParent()));
   var defaultParent = graph.getDefaultParent();
 
@@ -72,13 +78,23 @@ function UpdateGraphCells(graph, cells) {
   finally {
     graph.getModel().endUpdate();
   }
+
   graph.refresh();
+};
+
+// Updates the attributes in a similar fashion to how the graph is updated.
+// Complexity here comes from socket.io not packing functions into the JS objects it sends.
+// The workaround used here is to transmit attribute rules as strings, then rebuild them here as below.
+function UpdateGraphAttributes(newAttributes) {
+  for (var key in newAttributes) {
+    newAttributes[key].AND_rule = new Function('return ' + newAttributes[key].AND_rule)();
+    newAttributes[key].OR_rule = new Function('return ' + newAttributes[key].OR_rule)();
+  }
+  attributes = newAttributes;
 };
 
 // Catches messages from the server containing trees, and unpacks them
 socket.on('tree_data', function(data) {
-  var graph = ReturnGraph();
-  var recv_cells = data.cells;
-  attributes = data.attributes;
-  UpdateGraphCells(graph, recv_cells);
+  UpdateGraphAttributes(data.attributes);
+  UpdateGraphCells(ReturnGraph(), data.cells);
 });
