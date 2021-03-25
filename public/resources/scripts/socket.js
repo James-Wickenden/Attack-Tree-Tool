@@ -87,11 +87,11 @@ function UpdateGraphCells(graph, cells) {
 // Complexity here comes from socket.io not packing functions into the JS objects it sends.
 // The workaround used here is to transmit attribute rules as strings, then rebuild them here as below.
 function UpdateGraphAttributes(newAttributes) {
-    for (var key in newAttributes) {
-        newAttributes[key].AND_rule = new Function('return ' + newAttributes[key].AND_rule)();
-        newAttributes[key].OR_rule = new Function('return ' + newAttributes[key].OR_rule)();
-    }
     attributes = JSON.parse(JSON.stringify(newAttributes));
+    for (var key in attributes) {
+        attributes[key].AND_rule = new Function('return ' + attributes[key].AND_rule)();
+        attributes[key].OR_rule = new Function('return ' + attributes[key].OR_rule)();
+    }
 };
 
 // Catches messages from the server containing trees, and unpacks them

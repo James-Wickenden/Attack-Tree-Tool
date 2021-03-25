@@ -113,7 +113,6 @@ function main(container) {
             if (!state.view.graph.getModel().isVertex(state.cell)) return;
             var result = state.cell.getAttribute('label');
             result += '\n' + state.cell.getId();
-            console.log("rendering label...");
             if (cur_attribute_index == -1) {
                 for (var key in attributes) {
                     var attr_val = GetReadableAttributeValue(key, state.cell.getAttribute(key));

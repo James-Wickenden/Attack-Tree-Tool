@@ -33,7 +33,6 @@ function DepthFirst_ParseToTextual(cell, cell_path_str) {
     if (GetChildren(cell).length >= 2) cell_str += ' (' + cell.getAttribute('nodetype') + ')';
     cell_str += '<br>';
 
-    console.log("parsing to list...");
     for (var key in attributes) {
         var attr_val = GetReadableAttributeValue(key, cell.getAttribute(key));
         cell_str += spacecount + key + ': ' + attr_val + '<br>';
@@ -237,7 +236,6 @@ function TurnListIntoEditableForm(li, cell, graph) {
         cellForm_Attr_lbl.innerHTML = key + ':&nbsp;';
         cellForm_Attr_lbl.style.marginLeft = '10%';
 
-        console.log("making form...");
         var attr_val = GetReadableAttributeValue(key, cell.getAttribute(key));
         cellForm_Attr_txt.placeholder = attr_val;
         cellForm_Attr_txt.style.marginTop = '8px';
