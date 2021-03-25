@@ -113,14 +113,17 @@ function main(container) {
             if (!state.view.graph.getModel().isVertex(state.cell)) return;
             var result = state.cell.getAttribute('label');
             result += '\n' + state.cell.getId();
+            console.log("rendering label...");
             if (cur_attribute_index == -1) {
                 for (var key in attributes) {
-                    result += '\n' + key + ':' + state.cell.getAttribute(key);
+                    var attr_val = GetReadableAttributeValue(key, state.cell.getAttribute(key));
+                    result += '\n' + key + ':' + attr_val;
                 }
             }
             else if (cur_attribute_index != -2) {
                 var attr_name = GetIndexFromAttributes()[cur_attribute_index];
-                result += '\n' + attr_name + ':' + state.cell.getAttribute(attr_name);
+                var attr_val = GetReadableAttributeValue(attr_name, state.cell.getAttribute(attr_name));
+                result += '\n' + attr_name + ':' + attr_val;
             }
 
             return result;
@@ -154,6 +157,14 @@ function main(container) {
         graph.refresh();
     }
 };
+
+// Returns a stringified attribute value. True/False values are stored internally as floats and must be converted.
+function GetReadableAttributeValue(attr_name, value) {
+    if (value === undefined) return value;
+    var attr_val = value.valueOf();
+    if (attributes[attr_name].domain == domains.TRUE_FALSE) attr_val = {0:'False', 1:'True'}[attr_val];
+    return attr_val.toString();
+}
 
 // A function to return the graph for local functions to not require global variables.
 // This is redefined above within the scope of var graph.
@@ -410,9 +421,14 @@ function TraverseTree(graph, vertex_function) {
 // should only be possible to modify leaves that already have a cost attribute
 function EditAttribute(graph, cell, attributeName) {
     var attr = attributes[attributeName];
-    var newValue = parseFloat(prompt("Enter new " + attributeName + " value for cell:", 0));
-    if (!NewAttributeIsValid(newValue, attr)) newValue = attr.default_val;
-    cell.setAttribute(attributeName, newValue);
+    var newValue = prompt("Enter new " + attributeName + " value for cell:", 0);
+    var validatedAttribute = ValidateAttribute(newValue, attr);
+    if (validatedAttribute[0] == false) {
+        return;
+    }
+    else {
+        cell.setAttribute(attributeName, validatedAttribute[1]);
+    }
 
     PropagateChangeUpTree(graph, cell, attr);
     graph.refresh();
@@ -423,7 +439,7 @@ function EditAttribute(graph, cell, attributeName) {
 function PropagateChangeUpTree(graph, cell, attribute) {
     var parent = cell.getTerminal(true);
     var children = GetChildren(cell);
-
+    
     if (children.length == 1) {
         cell.setAttribute(attribute.name, parseFloat(children[0].getAttribute(attribute.name)));
     }

@@ -39,24 +39,44 @@ function AddAttribute(attributeName, attributeDesc,
 };
 
 // Given a new attribute value, use the given attribute domain to determine whether its valid or not.
-function NewAttributeIsValid(newValue, attribute) {
-    console.log(attribute);
-    if (newValue === null || isNaN(newValue)) return false;
+// Returns a list containing two elements:
+// First, a boolean value whether the given attribute value is valid or not.
+// If this is true, the second element is the parsed and typed value to be used. This could be a boolean, a float, an int, etc.
+function ValidateAttribute(newValue, attribute) {
+    if (newValue === null || newValue === undefined || newValue == '') return [false];
     switch (attribute.domain) {
         case domains.TRUE_FALSE:
+            var newValue_UC = newValue.toUpperCase();
+            if (newValue_UC == 'TRUE') return [true, 1];
+            if (newValue_UC == 'FALSE') return [true, 0];
             break;
-        case domains.TRUE_FALSE:
+        case domains.UNIT_INTERVAL:
+            var newValue_float = parseFloat(newValue);
+            if (isNaN(newValue_float)) return [false];
+            if (newValue_float >= 0 && newValue_float <= 1) return [true, newValue_float];
             break;
-        case domains.TRUE_FALSE:
+        case domains.RATIONAL:
+            var newValue_float = parseFloat(newValue);
+            if (isNaN(newValue_float)) return [false];
+            if (newValue_float > -Infinity && newValue_float < Infinity) return [true, newValue_float];
             break;
-        case domains.TRUE_FALSE:
+        case domains.POSITIVE_RATIONAL:
+            var newValue_float = parseFloat(newValue);
+            if (isNaN(newValue_float)) return [false];
+            if (newValue_float >= 0 && newValue_float < Infinity) return [true, newValue_float];
             break;
-        case domains.TRUE_FALSE:
+        case domains.INTEGER:
+            var newValue_int = parseInt(newValue);
+            if (isNaN(newValue_float)) return [false];
+            if (newValue_int > -Infinity && newValue_int < Infinity) return [true, newValue_int];
             break;
-        case domains.TRUE_FALSE:
+        case domains.POSITIVE_INTEGER:
+            var newValue_int = parseInt(newValue);
+            if (isNaN(newValue_float)) return [false];
+            if (newValue_int >= 0 && newValue_int < Infinity) return [true, newValue_int];
             break;
     };
-    return true;
+    return [false];
 };
 
 // Navigating through attributes requires that we index them; this is done by iterating through keys and assigning sequenctial indices to them.
@@ -90,4 +110,15 @@ AddAttribute('probability', '',
     },
     function (current, child) {
         return current + child - (current * child);
+    });
+
+AddAttribute('possible', '',
+    domains.TRUE_FALSE, 1.0,
+    function (current, child) {
+        if (current == 0 || child == 0) return 0;
+        return 1;
+    },
+    function (current, child) {
+        if (current == 1 || child == 1) return 1;
+        return 0;
     });

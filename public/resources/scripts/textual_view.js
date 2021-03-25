@@ -33,8 +33,10 @@ function DepthFirst_ParseToTextual(cell, cell_path_str) {
     if (GetChildren(cell).length >= 2) cell_str += ' (' + cell.getAttribute('nodetype') + ')';
     cell_str += '<br>';
 
+    console.log("parsing to list...");
     for (var key in attributes) {
-        cell_str += spacecount + key + ': ' + cell.getAttribute(key) + '<br>';
+        var attr_val = GetReadableAttributeValue(key, cell.getAttribute(key));
+        cell_str += spacecount + key + ': ' + attr_val + '<br>';
     }
     res.push(cell_str);
     res.push(cell.getId());
@@ -235,7 +237,9 @@ function TurnListIntoEditableForm(li, cell, graph) {
         cellForm_Attr_lbl.innerHTML = key + ':&nbsp;';
         cellForm_Attr_lbl.style.marginLeft = '10%';
 
-        cellForm_Attr_txt.placeholder = cell.getAttribute(key);
+        console.log("making form...");
+        var attr_val = GetReadableAttributeValue(key, cell.getAttribute(key));
+        cellForm_Attr_txt.placeholder = attr_val;
         cellForm_Attr_txt.style.marginTop = '8px';
         cellForm_Attr_txt.setAttribute('name', 'cellForm_' + key);
         if (childCount > 0) cellForm_Attr_txt.disabled = true;
@@ -302,10 +306,15 @@ function HandleFormSubmit(cellForm, graph, cell, childCount) {
     // Each attribute should be checked to see if its valid for that attribute; ie within the attribute domain.
     if (childCount == 0) {
         for (var key in attributes) {
-            var newAttrValue = parseFloat(formInputs['cellForm_' + key].value);
-            if (!NewAttributeIsValid(newAttrValue, attributes[key])) continue;
-            cell.setAttribute(key, newAttrValue);
-            PropagateChangeUpTree(graph, cell, attributes[key]);
+            var newValue = formInputs['cellForm_' + key].value;
+            var validatedAttribute = ValidateAttribute(newValue, attributes[key]);
+            if (validatedAttribute[0] == false) {
+                continue;
+            }
+            else {
+                cell.setAttribute(key, validatedAttribute[1]);
+                PropagateChangeUpTree(graph, cell, attributes[key]);
+            }
         }
     }
     else if (childCount >= 2) {
