@@ -7,11 +7,13 @@ html, body {
     height: 100%;
 }
 
+/* The highest-level container for the flexboxes. */
 #mxflexContainer {
     display: flex;
     height: 90%;
 }
 
+/* The two main left/right divs and their flex styling. */
 #graphContainer {
     flex: 3 0 0;
     background-color: beige;
@@ -25,6 +27,7 @@ html, body {
     border: 1px solid black;
 }
 
+/* These elements handle displaying the right hand side tabs, the buttons, and their content */
 .tabs {
     overflow: hidden;
     border: 1px solid #ccc;
@@ -49,7 +52,6 @@ html, body {
 }
 
 .tabcontent {
-    flex-flow: column;
     height: 100%;
     display: none;
     padding: 6px 12px;
@@ -57,6 +59,7 @@ html, body {
     border-top: none;
 }
 
+/* These elements handle displaying the list elements in the textual view */
 #textual_cells_list {
     list-style-type: none;
     margin: 0;
@@ -70,4 +73,14 @@ html, body {
 
 #textual_cells_list > li:nth-child(odd) {
     background: #efefef;
+}
+
+/* These elements handle displaying the attribute elements in the attribute navigator */
+.attrContent {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #888;
+}
+
+#attributeCellForm {
+    font-family: 'Courier New', monospace;
 }

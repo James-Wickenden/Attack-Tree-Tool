@@ -8,7 +8,7 @@
 // Dictionary of the current graph attributes
 // The keys are attribute names, and the values are objects holding the attribute data
 var attributes = {};
-var cur_attribute_index = -1;
+//var cur_attribute_index = -1;
 
 const domains = {
     TRUE_FALSE: 0,
@@ -33,9 +33,16 @@ function AddAttribute(attributeName, attributeDesc,
     attr.OR_rule = OR_rule;
     attr.domain = domain;
     attr.default_val = default_val;
+    attr.display = true;
 
     attributes[attributeName] = attr;
     return attr;
+};
+
+function ShowHideAttribute(cb, graph) {
+    var key = cb.id.split('adl_cb_')[1];
+    attributes[key].display = cb.checked;
+    graph.refresh();
 };
 
 // Given a new attribute value, use the given attribute domain to determine whether its valid or not.
@@ -91,6 +98,87 @@ function GetIndexFromAttributes() {
         i++;
     }
     return attribute_indices;
+};
+
+// Validate and then update the edited attribute in the attribute editor for that cell.
+function UpdateCellAttribute(graph, cell, attrInput) {
+    var str_newValue = attrInput.value;
+    var attr_key = attrInput.name.split('acf_')[1];
+    var validatedAttribute = ValidateAttribute(str_newValue, attributes[attr_key]);
+
+    if (validatedAttribute[0] == false) {
+        return;
+    }
+    else {
+        cell.setAttribute(attr_key, validatedAttribute[1]);
+    }
+
+    PropagateChangeUpTree(graph, cell, attributes[attr_key]);
+    EmitTree(graph);
+    graph.refresh();
+};
+
+// When a cell is clicked, display its attributes in a form in the attribute navigator.
+function SetUpClickedCellAttributeDisplay(graph, cell) {
+    var acf = document.getElementById('attributeCellForm');
+    acf.innerHTML = '';
+
+    var attributeForm = document.createElement('form');
+
+    // For each attribute, create a label and input pair of nodes to change them.
+    var childCount = GetChildren(cell).length;
+    for (var key in attributes) {
+        var cellForm_Attr_lbl = document.createElement('label');
+        var cellForm_Attr_txt = document.createElement('input');
+
+        cellForm_Attr_lbl.innerHTML = key + ':&nbsp;';
+
+        var attr_val = GetReadableAttributeValue(key, cell.getAttribute(key));
+        cellForm_Attr_txt.placeholder = attr_val;
+        cellForm_Attr_txt.style.marginTop = '8px';
+        cellForm_Attr_txt.setAttribute('name', 'acf_' + key);
+        if (childCount > 0) {
+            cellForm_Attr_txt.disabled = true;
+        }
+        else {
+            cellForm_Attr_txt.onkeypress = function (evt) { if(evt.key == 'Enter') UpdateCellAttribute(graph, cell, this); };
+        }
+
+        attributeForm.appendChild(cellForm_Attr_lbl);
+        attributeForm.appendChild(cellForm_Attr_txt);
+        attributeForm.appendChild(document.createElement("br"));
+    }
+
+    if (childCount > 0) {
+        attributeForm.appendChild(document.createElement("br"));
+        var disableAttributeEditingMessage = document.createElement('label');
+        disableAttributeEditingMessage.style.color = 'red';
+        disableAttributeEditingMessage.innerHTML = 'Only leaf nodes can have their attributes changed.';
+        attributeForm.appendChild(disableAttributeEditingMessage);
+    }
+
+    acf.appendChild(attributeForm);
+};
+
+// Creates a list of attributes with the option to display/hide their values on nodes
+function LoadAttributeListDisplay(graph) {
+    var adl = document.getElementById('attribute_display_list');
+    adl.innerHTML = '';
+
+    for (var key in attributes) {
+        var attr_cb = document.createElement('input');
+        var attr_lb = document.createElement('label');
+        var id = 'adl_cb_' + key;
+        attr_cb.id = id;
+        attr_cb.type = "checkbox";
+        attr_cb.checked = attributes[key].display;
+        attr_cb.style.cursor = 'pointer';
+        attr_cb.onclick = function () { ShowHideAttribute(this, graph); };
+        attr_lb.innerHTML = key;
+        adl.appendChild(attr_cb);
+        adl.appendChild(attr_lb);
+        adl.appendChild(document.createElement("br"));
+    }
 };
 
 // A pair of sample attributes for testing

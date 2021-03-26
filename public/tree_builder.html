@@ -26,8 +26,8 @@
 
         <div id='tabContainer'>
             <div class='tabs'>
-                <button class='tablink' id='defaultTabView' onclick="OpenTab(event, 'listContainer');">List View</button>
-                <button class='tablink' onclick="OpenTab(event, 'attrContainer');">Attribute Navigator</button>
+                <button class='tablink' onclick="OpenTab(event, 'listContainer');">List View</button>
+                <button class='tablink' id='defaultTabView' onclick="OpenTab(event, 'attrContainer');">Attribute Navigator</button>
             </div>
 
             <div id='listContainer' class='tabcontent'>
@@ -35,7 +35,13 @@
             </div>
 
             <div id='attrContainer' class='tabcontent'>
-                <h3>Attribute Navigator</h3>
+                <div id='attributeList' class='attrContent'>
+                    <h3>Display Attributes:</h3>
+                    <form id="attribute_display_list"></form>
+                </div>
+                
+                <div id='attributeCreator' class='attrContent'></div>
+                <div id='attributeCellForm' class='attrContent'></div>
             </div>
         </div>
         

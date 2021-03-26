@@ -88,7 +88,7 @@ function Load_textual_graph(cells_list, graph) {
     // Iterates through the list of cells, creating list elements for each, and styling them
     for (var i = 0; i < cells_list.length / 2; i++) {
         var li = document.createElement('li');
-        var id = cells_list[(i * 2) + 1]
+        var id = cells_list[(i * 2) + 1];
         li.style.cursor = 'pointer';
         li.onclick = function () { CreateTextCellButtons(this, id, graph); };
         li.innerHTML = cells_list[i * 2];
@@ -245,6 +245,15 @@ function TurnListIntoEditableForm(li, cell, graph) {
         cellForm.appendChild(cellForm_Attr_lbl);
         cellForm.appendChild(cellForm_Attr_txt);
         cellForm.appendChild(br.cloneNode());
+    }
+
+    if (childCount > 0) {
+        cellForm.appendChild(document.createElement("br"));
+        var disableAttributeEditingMessage = document.createElement('label');
+        disableAttributeEditingMessage.style.color = 'red';
+        disableAttributeEditingMessage.innerHTML = 'Only leaf nodes can have their attributes changed.';
+        cellForm.appendChild(disableAttributeEditingMessage);
+        cellForm.appendChild(document.createElement("br"));
     }
 
     // Add a submit and cancel button to navigate out of the form

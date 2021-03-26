@@ -51,6 +51,7 @@ function main(container) {
         var defaultRefresh = graph.refresh;
         graph.refresh = function () {
             Load_textual_graph(ParseTextually(graph), graph);
+            document.getElementById('attributeCellForm').innerHTML = '';
             return defaultRefresh.apply(this, arguments);
         };
 
@@ -106,14 +107,26 @@ function main(container) {
 
         // Overrides the popupMenuHandler method to the defined context-sensitive one.
         graph.popupMenuHandler.factoryMethod = function (menu, cell, evt) {
+            document.getElementById('attributeCellForm').innerHTML = '';
             return CreateContextMenu(graph, menu, cell, evt);
         };
+
+        // Add a click listener to set up the attribute navigator with the selected cell's info.
+        graph.addListener(mxEvent.CLICK, function (sender, evt) {
+            var cell = evt.getProperty("cell");
+            if (cell != null) {
+                if (graph.getModel().isEdge(cell)) return;
+                SetUpClickedCellAttributeDisplay(graph, cell);
+            }
+            evt.consume();
+        });
 
         // Renders attribute values on cells as a temporary display method
         graph.cellRenderer.getLabelValue = function (state) {
             if (!state.view.graph.getModel().isVertex(state.cell)) return;
             var result = state.cell.getAttribute('label');
             result += '\n' + state.cell.getId();
+            /*
             if (cur_attribute_index == -1) {
                 for (var key in attributes) {
                     var attr_val = GetReadableAttributeValue(key, state.cell.getAttribute(key));
@@ -124,6 +137,13 @@ function main(container) {
                 var attr_name = GetIndexFromAttributes()[cur_attribute_index];
                 var attr_val = GetReadableAttributeValue(attr_name, state.cell.getAttribute(attr_name));
                 result += '\n' + attr_name + ':' + attr_val;
+            }
+            */
+
+            for (var key in attributes) {
+                if (!attributes[key].display) continue;
+                var attr_val = GetReadableAttributeValue(key, state.cell.getAttribute(key));
+                result += '\n' + key + ':' + attr_val;
             }
 
             return result;
@@ -152,8 +172,9 @@ function main(container) {
             graph.getModel().endUpdate();
         }
 
-        AddNavigator(container, graph);
+        //AddNavigator(container, graph);
         ReturnGraph = function () { return graph; };
+        LoadAttributeListDisplay(graph);
         document.getElementById('defaultTabView').click();
 
         graph.refresh();
@@ -175,7 +196,7 @@ function ReturnGraph() { return null; };
 // Adds a navigator to scroll through attributes.
 // TODO: add another fixed toolbar in another div with overarching functionality eg attribute control, XML/Yaml handling, File controls etc.
 function AddNavigator(container, graph) {
-    
+    /*
     var navigator_div = document.createElement('div');
     var wnd;
     navigator_div.style.padding = '4px';
@@ -198,6 +219,7 @@ function AddNavigator(container, graph) {
     wnd.setScrollable(false);
     wnd.setResizable(false);
     wnd.setVisible(true);
+    */
 };
 
 // Adds buttons to a node with key node functions:
@@ -375,7 +397,7 @@ function AddChild(graph, cell) {
             cell.setAttribute(attr.name, attr.default_val);
             PropagateChangeUpTree(graph, cell, attr);
         }
-        xmlnode.setAttribute('label', 'New Cell[' + newnode.getId() / 2 + ']');
+        xmlnode.setAttribute('label', 'New Cell');
         graph.refresh();
     }
     finally {
@@ -500,6 +522,6 @@ function OpenTab(evt, tabType) {
         tablinks[i].className = tablinks[i].className.replace(' active', '');
     }
 
-    document.getElementById(tabType).style.display = 'flex';
+    document.getElementById(tabType).style.display = 'block';
     evt.currentTarget.className += ' active';
 };

@@ -59,7 +59,7 @@ function UpdateGraphCells(graph, cells) {
             var parentCell = graph.getModel().getCell(cells[i].parent);
             var xmlnode = GetXMLNode(cells[i].data);
             var newnode = graph.insertVertex(defaultParent, cells[i].id, xmlnode);
-            
+
             // Updates the geometry of the vertex with the preferred size computed in the graph
             var geometry = graph.getModel().getGeometry(newnode);
             var size = graph.getPreferredSizeForCell(newnode);
@@ -86,6 +86,9 @@ function UpdateGraphCells(graph, cells) {
 // Complexity here comes from socket.io not packing functions into the JS objects it sends.
 // The workaround used here is to transmit attribute rules as strings, then rebuild them here as below.
 function UpdateGraphAttributes(newAttributes) {
+    for (var key in attributes) {
+        if (key in newAttributes) newAttributes[key].display = attributes[key].display;
+    }
     attributes = JSON.parse(JSON.stringify(newAttributes));
     for (var key in attributes) {
         attributes[key].AND_rule = new Function('return ' + attributes[key].AND_rule)();
@@ -95,6 +98,7 @@ function UpdateGraphAttributes(newAttributes) {
 
 // Catches messages from the server containing trees, and unpacks them
 socket.on('tree_data', function (data) {
+    //console.log(data);
     UpdateGraphAttributes(data.attributes);
     UpdateGraphCells(ReturnGraph(), data.cells);
 });
