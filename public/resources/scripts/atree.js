@@ -173,6 +173,7 @@ function ReturnGraph() { return null; };
 // Adds a navigator to scroll through attributes.
 // TODO: add another fixed toolbar in another div with overarching functionality eg attribute control, XML/Yaml handling, File controls etc.
 function AddNavigator(container, graph) {
+    
     var navigator_div = document.createElement('div');
     var wnd;
     navigator_div.style.padding = '4px';

@@ -59,8 +59,7 @@ function UpdateGraphCells(graph, cells) {
             var parentCell = graph.getModel().getCell(cells[i].parent);
             var xmlnode = GetXMLNode(cells[i].data);
             var newnode = graph.insertVertex(defaultParent, cells[i].id, xmlnode);
-            console.log(cells);
-            console.log(graph.getModel());
+            
             // Updates the geometry of the vertex with the preferred size computed in the graph
             var geometry = graph.getModel().getGeometry(newnode);
             var size = graph.getPreferredSizeForCell(newnode);
