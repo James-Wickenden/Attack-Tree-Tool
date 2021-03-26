@@ -24,10 +24,21 @@
         <div id='graphContainer'>
         </div>
 
-        
-        <div id='textContainer'>
-            <ul id="textual_cells_list"></ul>
+        <div id='tabContainer'>
+            <div class='tabs'>
+                <button class='tablink' id='defaultTabView' onclick="OpenTab(event, 'listContainer');">List View</button>
+                <button class='tablink' onclick="OpenTab(event, 'attrContainer');">Attribute Navigator</button>
+            </div>
+
+            <div id='listContainer' class='tabcontent'>
+                <ul id="textual_cells_list"></ul>
+            </div>
+
+            <div id='attrContainer' class='tabcontent'>
+                <h3>Attribute Navigator</h3>
+            </div>
         </div>
+        
     </div>
     
 </body>
