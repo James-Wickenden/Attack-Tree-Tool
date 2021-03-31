@@ -362,6 +362,15 @@ function CreateContextMenu(graph, menu, cell, evt) {
     menu.addItem('Emit Tree (DEBUG)', 'resources/img/mxgraph_images/dot.gif', function () {
         EmitTree(graph);
     });
+
+    menu.addItem('Encode XML (DEBUG)', 'resources/img/mxgraph_images/export1.png', function () {
+        var encoder = new mxCodec();
+        var enc_result = encoder.encode(graph.getModel());
+        var enc_xml = mxUtils.getXml(enc_result);
+        console.log(enc_xml);
+        //encoder.decode(enc_xml, graph.getModel());
+        downloadToFile(enc_xml, 'attacktree.xml', 'text/xml');
+    });
 };
 
 // Create a new leaf node with cell as its parent node
@@ -524,4 +533,17 @@ function OpenTab(evt, tabType) {
 
     document.getElementById(tabType).style.display = 'block';
     evt.currentTarget.className += ' active';
+};
+
+// Simple function that allows for downloading files clientside.
+// Code from https://robkendal.co.uk/blog/2020-04-17-saving-text-to-client-side-file-using-vanilla-js
+function downloadToFile(content, filename, contentType) {
+    const a = document.createElement('a');
+    const file = new Blob([content], {type: contentType});
+    
+    a.href= URL.createObjectURL(file);
+    a.download = filename;
+    a.click();
+  
+    URL.revokeObjectURL(a.href);
 };

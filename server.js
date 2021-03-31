@@ -14,22 +14,21 @@ http.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
 });
 
-
 // Sets up express and its /GET page handlers
 function setup_express() {
     app
         .use(express.static(path.join(__dirname, 'public')))
         .get('/', (req, res) => {
-            console.log("Loading main...")
-            res.sendFile(path.join(__dirname, '/public/main.html'))
+            console.log("Loading main...");
+            res.sendFile(path.join(__dirname, '/public/main.html'));
         })
         .get('/socketchat', (req, res) => {
-            console.log("Loading socket.io test chat...")
-            res.sendFile(path.join(__dirname, '/public/socketchat.html'))
+            console.log("Loading socket.io test chat...");
+            res.sendFile(path.join(__dirname, '/public/socketchat.html'));
         })
         .get('/tree_builder', (req, res) => {
-            console.log("Loading tree builder...")
-            res.sendFile(path.join(__dirname, '/public/tree_builder.html'))
+            console.log("Loading tree builder...");
+            res.sendFile(path.join(__dirname, '/public/tree_builder.html'));
         });
     //.listen(PORT, () => console.log(`Listening on port ${ PORT }`));
 };
@@ -42,7 +41,7 @@ function setup_socket_io() {
             console.log('user disconnected');
         });
         socket.on('tree_data', (msg) => {
-            console.log(msg);
+            //console.log(msg);
             io.emit('tree_data', msg);
         });
         socket.on('chat message', (msg) => {
@@ -50,6 +49,4 @@ function setup_socket_io() {
             io.emit('chat message', msg);
         });
     });
-
-    //io.emit('some event', { someProperty: 'some value', otherProperty: 'other value' }); // This will emit the event to all connected sockets
 };
