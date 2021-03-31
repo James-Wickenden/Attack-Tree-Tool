@@ -157,6 +157,35 @@ function SetUpClickedCellAttributeDisplay(graph, cell) {
         attributeForm.appendChild(disableAttributeEditingMessage);
     }
 
+    // Add a submit and cancel button to navigate out of the form
+    // On clicking either, we must also restore the li onclick handler.
+    var cellForm_attr_sub = document.createElement('input');
+    cellForm_attr_sub.setAttribute('type', 'submit');
+    cellForm_attr_sub.setAttribute('value', 'Update Cell');
+    cellForm_attr_sub.style.cursor = 'pointer';
+    cellForm_attr_sub.style.marginTop = '6px';
+    cellForm_attr_sub.addEventListener('click', function (evt) {
+        evt.preventDefault();
+        HandleCellAttrSubmit(attributeForm, graph, cell, childCount);
+        return false;
+    });
+    attributeForm.appendChild(cellForm_attr_sub);
+
+    /*
+    var cellForm_attr_ccl = document.createElement('input');
+    cellForm_attr_ccl.setAttribute('type', 'submit');
+    cellForm_attr_ccl.setAttribute('value', 'Cancel Changes');
+    cellForm_attr_ccl.style.cursor = 'pointer';
+    cellForm_attr_ccl.style.marginTop = '6px';
+    cellForm_attr_ccl.style.marginLeft = '6px';
+    cellForm_attr_ccl.addEventListener('click', function (evt) {
+        evt.preventDefault();
+        acf.innerHTML = '';
+        return;
+    });
+    attributeForm.appendChild(cellForm_attr_ccl);
+    */
+
     acf.appendChild(attributeForm);
 };
 
@@ -179,6 +208,37 @@ function LoadAttributeListDisplay(graph) {
         adl.appendChild(attr_lb);
         adl.appendChild(document.createElement("br"));
     }
+};
+
+// Called when a cell's attributes are to be updated via the cell;s attribute navigator form.
+// Changed attributes must be validated, updated, and propagated.
+// Almost identical to the HandleFormSubmit() method in textual_view.js
+function HandleCellAttrSubmit(attributeForm, graph, cell, childCount) {
+    if (childCount > 0) return;
+
+    // First, build a dictionary for easy access to the form responses.
+    // Dictionary keys are the names given to the form elements as defined above.
+    var formAttributes = {};
+    for (var i = 0; i < attributeForm.children.length; i++) {
+        var childName = attributeForm.children[i].getAttribute('name');
+        if (childName != null) formAttributes[childName] = attributeForm.children[i];
+    }
+
+    // If a leaf node, update the attributes.
+    // Each attribute should be checked to see if its valid for that attribute; ie within the attribute domain.
+    for (var key in attributes) {
+        var newValue = formAttributes['acf_' + key].value;
+        var validatedAttribute = ValidateAttribute(newValue, attributes[key]);
+        if (validatedAttribute[0] == false) {
+            continue;
+        }
+        else {
+            cell.setAttribute(key, validatedAttribute[1]);
+            PropagateChangeUpTree(graph, cell, attributes[key]);
+        }
+    }
+
+    graph.refresh();
 };
 
 // A pair of sample attributes for testing
