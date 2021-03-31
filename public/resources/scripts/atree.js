@@ -363,10 +363,10 @@ function CreateContextMenu(graph, menu, cell, evt) {
         EmitTree(graph);
     });
 
-    menu.addItem('Encode XML (DEBUG)', 'resources/img/mxgraph_images/export1.png', function () {
+    menu.addItem('Download XML (DEBUG)', 'resources/img/mxgraph_images/export1.png', function () {
         var encoder = new mxCodec();
         var enc_result = encoder.encode(graph.getModel());
-        var enc_xml = mxUtils.getXml(enc_result);
+        var enc_xml = mxUtils.getPrettyXml(enc_result);
         console.log(enc_xml);
         //encoder.decode(enc_xml, graph.getModel());
         downloadToFile(enc_xml, 'attacktree.xml', 'text/xml');
