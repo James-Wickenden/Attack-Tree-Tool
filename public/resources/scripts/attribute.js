@@ -157,35 +157,36 @@ function SetUpClickedCellAttributeDisplay(graph, cell) {
         disableAttributeEditingMessage.innerHTML = 'Only leaf nodes can have their attributes changed.';
         attributeForm.appendChild(disableAttributeEditingMessage);
     }
+    else {
+        // Add a submit and cancel button to navigate out of the form
+        // On clicking either, we must also restore the li onclick handler.
+        var cellForm_attr_sub = document.createElement('input');
+        cellForm_attr_sub.setAttribute('type', 'submit');
+        cellForm_attr_sub.setAttribute('value', 'Update Cell');
+        cellForm_attr_sub.style.cursor = 'pointer';
+        cellForm_attr_sub.style.marginTop = '6px';
+        cellForm_attr_sub.addEventListener('click', function (evt) {
+            evt.preventDefault();
+            HandleCellAttrSubmit(attributeForm, graph, cell, childCount);
+            return false;
+        });
+        attributeForm.appendChild(cellForm_attr_sub);
 
-    // Add a submit and cancel button to navigate out of the form
-    // On clicking either, we must also restore the li onclick handler.
-    var cellForm_attr_sub = document.createElement('input');
-    cellForm_attr_sub.setAttribute('type', 'submit');
-    cellForm_attr_sub.setAttribute('value', 'Update Cell');
-    cellForm_attr_sub.style.cursor = 'pointer';
-    cellForm_attr_sub.style.marginTop = '6px';
-    cellForm_attr_sub.addEventListener('click', function (evt) {
-        evt.preventDefault();
-        HandleCellAttrSubmit(attributeForm, graph, cell, childCount);
-        return false;
-    });
-    attributeForm.appendChild(cellForm_attr_sub);
-
-    /*
-    var cellForm_attr_ccl = document.createElement('input');
-    cellForm_attr_ccl.setAttribute('type', 'submit');
-    cellForm_attr_ccl.setAttribute('value', 'Cancel Changes');
-    cellForm_attr_ccl.style.cursor = 'pointer';
-    cellForm_attr_ccl.style.marginTop = '6px';
-    cellForm_attr_ccl.style.marginLeft = '6px';
-    cellForm_attr_ccl.addEventListener('click', function (evt) {
-        evt.preventDefault();
-        acf.innerHTML = '';
-        return;
-    });
-    attributeForm.appendChild(cellForm_attr_ccl);
-    */
+        /*
+        var cellForm_attr_ccl = document.createElement('input');
+        cellForm_attr_ccl.setAttribute('type', 'submit');
+        cellForm_attr_ccl.setAttribute('value', 'Cancel Changes');
+        cellForm_attr_ccl.style.cursor = 'pointer';
+        cellForm_attr_ccl.style.marginTop = '6px';
+        cellForm_attr_ccl.style.marginLeft = '6px';
+        cellForm_attr_ccl.addEventListener('click', function (evt) {
+            evt.preventDefault();
+            acf.innerHTML = '';
+            return;
+        });
+        attributeForm.appendChild(cellForm_attr_ccl);
+        */
+    }
 
     acf.appendChild(attributeForm);
 };
