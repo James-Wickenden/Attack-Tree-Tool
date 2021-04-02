@@ -20,6 +20,14 @@
 
 <body onload="main(document.getElementById('graphContainer'));">
     <h1>Tree builder</h1>
+
+    <form id='xmlimport' onsubmit="ImportXML(event)">
+        <label id='lab_import_xml'>Upload xml graph:&#160;</label>
+        <input type="file" id="s_xml"></input>
+        <input id="but_submit_xml" type="submit" value="Submit"></input>
+    </form>
+    <br>
+
     <div id='mxflexContainer';>
         <div id='graphContainer'>
         </div>

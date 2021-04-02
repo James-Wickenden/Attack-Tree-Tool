@@ -363,12 +363,11 @@ function CreateContextMenu(graph, menu, cell, evt) {
     });
 
     menu.addItem('Download XML (DEBUG)', 'resources/img/mxgraph_images/export1.png', function () {
-        var encoder = new mxCodec();
-        var enc_result = encoder.encode(graph.getModel());
-        var enc_xml = mxUtils.getPrettyXml(enc_result);
-        console.log(enc_xml);
-        //encoder.decode(enc_xml, graph.getModel());
-        downloadToFile(enc_xml, 'attacktree.xml', 'text/xml');
+        DownloadGraphXML(graph);
+    });
+
+    menu.addItem('Upload XML (DEBUG)', 'resources/img/mxgraph_images/camera.png', function () {
+        UploadGraphXML(graph);
     });
 };
 
@@ -534,9 +533,64 @@ function OpenTab(evt, tabType) {
     evt.currentTarget.className += ' active';
 };
 
+// Create the global toolbar and its links
+function SetUpToolbar() {
+    /*
+    needed:
+    file
+        new
+        export png via https://jgraph.github.io/mxgraph/docs/js-api/files/util/mxImageExport-js.html
+        load xml
+        save xml
+    information
+        help
+        about
+        preferences
+    groups:
+        create group
+        join group/leave group
+    */
+};
+
+// Given the graph, download the model as pretty XML.
+// This version does not support attribute encoding, another method may be required!
+function DownloadGraphXML(graph) {
+    var encoder = new mxCodec();
+    var enc_result = encoder.encode(graph.getModel());
+    var enc_xml = mxUtils.getPrettyXml(enc_result);
+    console.log(enc_xml);
+    //encoder.decode(enc_xml, graph.getModel());
+    DownloadToFile(enc_xml, 'attacktree.xml', 'text/xml');
+};
+
+// Request an XML file upload, parse it, and set the model.
+function UploadGraphXML(xml_str) {
+    var graph = ReturnGraph();
+    var xml_graph = mxUtils.parseXml(xml_str);
+    var codec = new mxCodec(xml_graph);
+    codec.decode(xml_graph.documentElement, graph.getModel());
+    // this is buggy and requires fixing!!
+    graph.refresh();
+
+    // after setting model, parse and load attributes!
+};
+
+function ImportXML(event) {
+    event.preventDefault();
+    var xmlInput = document.getElementById('s_xml');
+    var file = xmlInput.files[0];
+    var reader = new FileReader();
+    
+    reader.onload = function (e) {
+        var xml_str = reader.result;
+        UploadGraphXML(xml_str);
+    };
+    reader.readAsText(file);
+};
+
 // Simple function that allows for downloading files clientside.
 // Code from https://robkendal.co.uk/blog/2020-04-17-saving-text-to-client-side-file-using-vanilla-js
-function downloadToFile(content, filename, contentType) {
+function DownloadToFile(content, filename, contentType) {
     const a = document.createElement('a');
     const file = new Blob([content], {type: contentType});
     
