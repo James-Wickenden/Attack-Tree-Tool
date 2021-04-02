@@ -4,7 +4,6 @@
 */
 
 var doc;
-// TODO: replace this with a list of user-constructed objects containing default values, combination rules, name/description, etc.
 
 function main(container) {
     // Checks if browser is supported, throws an error if not.

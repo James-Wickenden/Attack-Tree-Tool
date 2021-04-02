@@ -6,6 +6,6 @@ Technologies used:
 
 - [Node.JS](https://nodejs.org/en/)
 - [Express](https://expressjs.com/)
-- [socket.io](https://socket.io/) (to be reworked to yjs)
+- [socket.io](https://socket.io/)
 - [mxgraph](https://jgraph.github.io/mxgraph/)
 - [Heroku](https://www.heroku.com/) - view the live server [here](https://desolate-dawn-31882.herokuapp.com/)
