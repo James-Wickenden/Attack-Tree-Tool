@@ -21,10 +21,12 @@ function OR_rule_realnumbers(current, child) {
 const domains = {
     TRUE_FALSE: {
         AND_rule: function (current, child) {
-            if (!current || !child) return false;
-            return 1;
+            if (current == 1 && child == 1) return 1;
+            return 0;
         },
         OR_rule: function (current, child) {
+            if (current == 1 || child == 1) return 1;
+            return 0;
         }
     },
     UNIT_INTERVAL: {
@@ -87,32 +89,32 @@ function ShowHideAttribute(cb, graph) {
 function ValidateAttribute(newValue, attribute) {
     if (newValue === null || newValue === undefined || newValue == '') return [false];
     switch (attribute.domain) {
-        case domains.TRUE_FALSE:
+        case 'TRUE_FALSE':
             var newValue_UC = newValue.toUpperCase();
             if (newValue_UC == 'TRUE') return [true, 1];
             if (newValue_UC == 'FALSE') return [true, 0];
             break;
-        case domains.UNIT_INTERVAL:
+        case 'UNIT_INTERVAL':
             var newValue_float = parseFloat(newValue);
             if (isNaN(newValue_float)) return [false];
             if (newValue_float >= 0 && newValue_float <= 1) return [true, newValue_float];
             break;
-        case domains.RATIONAL:
+        case 'RATIONAL':
             var newValue_float = parseFloat(newValue);
             if (isNaN(newValue_float)) return [false];
             if (newValue_float > -Infinity && newValue_float < Infinity) return [true, newValue_float];
             break;
-        case domains.POSITIVE_RATIONAL:
+        case 'POSITIVE_RATIONAL':
             var newValue_float = parseFloat(newValue);
             if (isNaN(newValue_float)) return [false];
             if (newValue_float >= 0 && newValue_float < Infinity) return [true, newValue_float];
             break;
-        case domains.INTEGER:
+        case 'INTEGER':
             var newValue_int = parseInt(newValue);
             if (isNaN(newValue_float)) return [false];
             if (newValue_int > -Infinity && newValue_int < Infinity) return [true, newValue_int];
             break;
-        case domains.POSITIVE_INTEGER:
+        case 'POSITIVE_INTEGER':
             var newValue_int = parseInt(newValue);
             if (isNaN(newValue_float)) return [false];
             if (newValue_int >= 0 && newValue_int < Infinity) return [true, newValue_int];

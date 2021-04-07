@@ -180,8 +180,7 @@ function main(container) {
     }
 };
 
-/*
-// Returns a stringified attribute value. True/False values are stored internally as floats and must be converted.
+// Returns a stringified attribute value.
 function GetReadableAttributeValue(attr_name, value) {
     if (value === undefined) return value;
     var attr_val = value.valueOf();
@@ -190,7 +189,6 @@ function GetReadableAttributeValue(attr_name, value) {
     }
     return attr_val.toString();
 };
-*/
 
 // A function to return the graph for local functions to not require global variables.
 // This is redefined above within the scope of var graph.
