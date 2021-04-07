@@ -9,29 +9,63 @@
 // Dictionary of the current graph attributes
 // The keys are attribute names, and the values are objects holding the attribute data
 var attributes = {};
-//var cur_attribute_index = -1;
+
+// Many domains have the same base rules for how they combine.
+function AND_rule_realnumbers(current, child) {
+    return current + child;
+};
+function OR_rule_realnumbers(current, child) {
+    return Math.min(current, child);
+};
 
 const domains = {
-    TRUE_FALSE: 0,
-    UNIT_INTERVAL: 1,
-    RATIONAL: 3,
-    POSITIVE_RATIONAL: 2,
-    INTEGER: 4,
-    POSITIVE_INTEGER: 5
-}
+    TRUE_FALSE: {
+        AND_rule: function (current, child) {
+            if (!current || !child) return false;
+            return 1;
+        },
+        OR_rule: function (current, child) {
+        }
+    },
+    UNIT_INTERVAL: {
+        AND_rule: function (current, child) {
+            return current * child;
+        },
+        OR_rule: function (current, child) {
+            return current + child - (current * child);
+        }
+    },
+    RATIONAL: {
+        AND_rule: AND_rule_realnumbers,
+        OR_rule: OR_rule_realnumbers
+    },
+    POSITIVE_RATIONAL: {
+        AND_rule: AND_rule_realnumbers,
+        OR_rule: OR_rule_realnumbers
+    },
+    INTEGER: {
+        AND_rule: AND_rule_realnumbers,
+        OR_rule: OR_rule_realnumbers
+    },
+    POSITIVE_INTEGER: {
+        AND_rule: AND_rule_realnumbers,
+        OR_rule: OR_rule_realnumbers
+    }
+};
+
+console.log(domains);
 
 // Adds a new attribute to the dictionary, its rules, and its domain.
 // rules should be functions of the form: function(current, child) { return [some new current value]; }
 // domains should be taken from the domains object, defined above.
 function AddAttribute(attributeName, attributeDesc,
-    domain, default_val,
-    AND_rule, OR_rule) {
+    domain, default_val) {
 
     const attr = {};
     attr.name = attributeName;
     attr.desc = attributeDesc;
-    attr.AND_rule = AND_rule;
-    attr.OR_rule = OR_rule;
+    //attr.AND_rule = AND_rule;
+    //attr.OR_rule = OR_rule;
     attr.domain = domain;
     attr.default_val = default_val;
     attr.display = true;
@@ -245,30 +279,10 @@ function HandleCellAttrSubmit(attributeForm, graph, cell, childCount) {
 
 // A pair of sample attributes for testing
 AddAttribute('cost', '',
-    domains.POSITIVE_RATIONAL, 0,
-    function (current, child) {
-        return current + child;
-    },
-    function (current, child) {
-        return Math.min(current, child);
-    });
+    'POSITIVE_RATIONAL', 0);
 
 AddAttribute('probability', '',
-    domains.UNIT_INTERVAL, 0,
-    function (current, child) {
-        return current * child;
-    },
-    function (current, child) {
-        return current + child - (current * child);
-    });
+    'UNIT_INTERVAL', 0);
 
 AddAttribute('possible', '',
-    domains.TRUE_FALSE, 1.0,
-    function (current, child) {
-        if (current == 0 || child == 0) return 0;
-        return 1;
-    },
-    function (current, child) {
-        if (current == 1 || child == 1) return 1;
-        return 0;
-    });
+    'TRUE_FALSE', 1.0);

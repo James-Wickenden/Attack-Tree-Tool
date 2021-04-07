@@ -34,11 +34,12 @@ function GetTreeData(graph) {
     });
     tree_data.cells = cells;
     tree_data.attributes = JSON.parse(JSON.stringify(attributes));
+    /*
     for (var key in tree_data.attributes) {
         tree_data.attributes[key].AND_rule = attributes[key].AND_rule.toString();
         tree_data.attributes[key].OR_rule = attributes[key].OR_rule.toString();
     }
-    
+    */
     return tree_data;
 };
 
@@ -96,11 +97,14 @@ function UpdateGraphAttributes(newAttributes) {
     for (var key in attributes) {
         if (key in newAttributes) newAttributes[key].display = attributes[key].display;
     }
+    attributes = newAttributes;
+    /*
     attributes = JSON.parse(JSON.stringify(newAttributes));
     for (var key in attributes) {
         attributes[key].AND_rule = new Function('return ' + attributes[key].AND_rule)();
         attributes[key].OR_rule = new Function('return ' + attributes[key].OR_rule)();
     }
+    */
 };
 
 // Catches messages from the server containing trees, and unpacks them

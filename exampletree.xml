@@ -1,0 +1,43 @@
+<mxGraphModel>
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+    <cell label="Root Goal" nodetype="AND" cost="0" probability="0" possible="1" id="root">
+      <mxCell vertex="1" parent="1">
+        <mxGeometry x="191.66666666666666" y="20" width="140" height="70" as="geometry" />
+      </mxCell>
+    </cell>
+    <cell nodetype="OR" cost="0" probability="0" possible="1" label="A" id="2">
+      <mxCell vertex="1" parent="1" source="root">
+        <mxGeometry x="87.56140350877192" y="166" width="140" height="70" as="geometry" />
+      </mxCell>
+    </cell>
+    <mxCell id="34" value="" edge="1" parent="1" source="root" target="2">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <cell nodetype="OR" cost="0" probability="0" possible="1" label="B" id="5">
+      <mxCell vertex="1" parent="1" source="root">
+        <mxGeometry x="295.7719298245614" y="166" width="140" height="70" as="geometry" />
+      </mxCell>
+    </cell>
+    <mxCell id="35" value="" edge="1" parent="1" source="root" target="5">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <cell nodetype="OR" cost="0" probability="0" possible="1" label="C" id="11">
+      <mxCell vertex="1" parent="1" source="5">
+        <mxGeometry x="209.77192982456143" y="312" width="140" height="70" as="geometry" />
+      </mxCell>
+    </cell>
+    <mxCell id="36" value="" edge="1" parent="1" source="5" target="11">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <cell nodetype="OR" cost="0" probability="0" possible="1" label="D" id="16">
+      <mxCell vertex="1" parent="1" source="5">
+        <mxGeometry x="381.7719298245614" y="312" width="140" height="70" as="geometry" />
+      </mxCell>
+    </cell>
+    <mxCell id="37" value="" edge="1" parent="1" source="5" target="16">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+  </root>
+</mxGraphModel>

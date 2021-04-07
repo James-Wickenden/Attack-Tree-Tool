@@ -180,13 +180,17 @@ function main(container) {
     }
 };
 
+/*
 // Returns a stringified attribute value. True/False values are stored internally as floats and must be converted.
 function GetReadableAttributeValue(attr_name, value) {
     if (value === undefined) return value;
     var attr_val = value.valueOf();
-    if (attributes[attr_name].domain == domains.TRUE_FALSE) attr_val = {0:'False', 1:'True'}[attr_val];
+    if (attributes[attr_name].domain == 'TRUE_FALSE') {
+        attr_val = {0:'False', 1:'True'}[attr_val];
+    }
     return attr_val.toString();
-}
+};
+*/
 
 // A function to return the graph for local functions to not require global variables.
 // This is redefined above within the scope of var graph.
@@ -405,7 +409,6 @@ function AddChild(graph, cell) {
             PropagateChangeUpTree(graph, cell, attr);
         }
         xmlnode.setAttribute('label', 'New Cell');
-        graph.refresh();
     }
     finally {
         graph.getModel().endUpdate();
@@ -477,10 +480,11 @@ function PropagateChangeUpTree(graph, cell, attribute) {
         cell.setAttribute(attribute.name, parseFloat(children[0].getAttribute(attribute.name)));
     }
     else if (children.length > 1) {
-        var func = ((cell.getAttribute('nodetype') == 'AND') ? attribute.AND_rule : attribute.OR_rule);
+        var domain = domains[attribute.domain];
+        var combinationRule = ((cell.getAttribute('nodetype') == 'AND') ? domain.AND_rule : domain.OR_rule);
         var cumulativeValue = parseFloat(children[0].getAttribute(attribute.name));
         for (i = 1; i < children.length; i++) {
-            cumulativeValue = func(cumulativeValue, parseFloat(children[i].getAttribute(attribute.name)));
+            cumulativeValue = combinationRule(cumulativeValue, parseFloat(children[i].getAttribute(attribute.name)));
         }
         cell.setAttribute(attribute.name, cumulativeValue);
     }

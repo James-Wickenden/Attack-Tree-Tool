@@ -1,0 +1,88 @@
+{
+  "cells": [
+    {
+      "data": {
+        "label": "Root Goal",
+        "nodetype": "AND",
+        "cost": "100",
+        "probability": "0",
+        "possible": "1"
+      },
+      "id": "root",
+      "parent": null
+    },
+    {
+      "data": {
+        "nodetype": "OR",
+        "cost": "100",
+        "probability": "0",
+        "possible": "1",
+        "label": "A"
+      },
+      "id": "2",
+      "parent": "root"
+    },
+    {
+      "data": {
+        "nodetype": "OR",
+        "cost": "0",
+        "probability": "1",
+        "possible": "1",
+        "label": "B"
+      },
+      "id": "5",
+      "parent": "root"
+    },
+    {
+      "data": {
+        "nodetype": "OR",
+        "cost": "10",
+        "probability": "1",
+        "possible": "1",
+        "label": "C"
+      },
+      "id": "9",
+      "parent": "5"
+    },
+    {
+      "data": {
+        "nodetype": "OR",
+        "cost": "0",
+        "probability": "0.5",
+        "possible": "0",
+        "label": "D"
+      },
+      "id": "14",
+      "parent": "5"
+    }
+  ],
+  "attributes": {
+    "cost": {
+      "name": "cost",
+      "desc": "",
+      "domain": 2,
+      "default_val": 0,
+      "display": true,
+      "AND_rule": "function (current, child) {\r\n        return current + child;\r\n    }",
+      "OR_rule": "function (current, child) {\r\n        return Math.min(current, child);\r\n    }"
+    },
+    "probability": {
+      "name": "probability",
+      "desc": "",
+      "domain": 1,
+      "default_val": 0,
+      "display": true,
+      "AND_rule": "function (current, child) {\r\n        return current * child;\r\n    }",
+      "OR_rule": "function (current, child) {\r\n        return current + child - (current * child);\r\n    }"
+    },
+    "possible": {
+      "name": "possible",
+      "desc": "",
+      "domain": 0,
+      "default_val": 1,
+      "display": true,
+      "AND_rule": "function (current, child) {\r\n        if (current == 0 || child == 0) return 0;\r\n        return 1;\r\n    }",
+      "OR_rule": "function (current, child) {\r\n        if (current == 1 || child == 1) return 1;\r\n        return 0;\r\n    }"
+    }
+  }
+}
