@@ -78,6 +78,23 @@ function AddAttribute(attributeName, attributeDesc,
     return attr;
 };
 
+// Deletes an attribute from the dictionary, and wipes the model's cells values for that attribute.
+// On rebuilding the graph, cells with a wiped attribute are not given it back.
+function DeleteAttribute(evt, graph, sender) {
+    evt.preventDefault();
+    var key = sender.id.split('adl_de_')[1];
+    if (!confirm("Are you sure you want to delete the attribute '" + key + "'?")) return;
+    
+    delete attributes[key];
+    TraverseTree(graph, function(vertex) {
+        vertex.setAttribute(key, 'DELETED');
+    });
+    graph.refresh();
+    EmitTree(graph);
+    LoadAttributeListDisplay(graph);
+};
+
+// Toggles between showing and hiding attributes on the visual graph view.
 function ShowHideAttribute(cb, graph) {
     var key = cb.id.split('adl_cb_')[1];
     attributes[key].display = cb.checked;
@@ -113,12 +130,12 @@ function ValidateAttribute(newValue, domain) {
             break;
         case 'INTEGER':
             var newValue_int = parseInt(newValue);
-            if (isNaN(newValue_float)) return [false];
+            if (isNaN(newValue_int)) return [false];
             if (newValue_int > -Infinity && newValue_int < Infinity) return [true, newValue_int];
             break;
         case 'POSITIVE_INTEGER':
             var newValue_int = parseInt(newValue);
-            if (isNaN(newValue_float)) return [false];
+            if (isNaN(newValue_int)) return [false];
             if (newValue_int >= 0 && newValue_int < Infinity) return [true, newValue_int];
             break;
     };
@@ -245,14 +262,26 @@ function LoadAttributeListDisplay(graph) {
     for (var key in attributes) {
         var attr_cb = document.createElement('input');
         var attr_lb = document.createElement('label');
-        var id = 'adl_cb_' + key;
-        attr_cb.id = id;
+        var attr_de = document.createElement('button');
+
+        attr_cb.id = 'adl_cb_' + key;
         attr_cb.type = "checkbox";
         attr_cb.checked = attributes[key].display;
         attr_cb.style.cursor = 'pointer';
         attr_cb.onclick = function () { ShowHideAttribute(this, graph); };
+
         attr_lb.innerHTML = key;
+        if (attributes[key].desc != '') attr_lb.title = attributes[key].desc;
+
+        attr_de.id = 'adl_de_' + key;
+        attr_de.innerHTML = '<img src="resources/img/mxgraph_images/delete2.png" />';
+        attr_de.style.cursor = 'pointer';
+        attr_de.style.padding = '0px';
+        attr_de.title = 'Delete attribute: ' + key;
+        attr_de.onclick = function(evt) { DeleteAttribute(evt, graph, this); };
+        
         adl.appendChild(attr_cb);
+        adl.appendChild(attr_de);
         adl.appendChild(attr_lb);
         adl.appendChild(document.createElement("br"));
     }
@@ -392,10 +421,9 @@ function SetUpAttributeEditor() {
     aef.appendChild(aef_cancel);
 };
 
-// Called when an attribute is added or edited
+// Called when an attribute is added
 // New attributes must have their default values validated or set to the domain default
 // Cells in the graph must then be given that default value and a socket emission made.
-// Edited attributes must similarly be updated.
 function HandleAttributeEditorSubmit(aef) {
     // First, build a dictionary for easy access to the form responses.
     // Dictionary keys are the names given to the form elements as defined above.
@@ -404,21 +432,25 @@ function HandleAttributeEditorSubmit(aef) {
         var childName = aef.children[i].getAttribute('name');
         if (childName != null) values[childName] = aef.children[i].value;
     }
-    
+
     // Some validation for non-empty names and invalid default values
+    if (attributes[values['aef_name']] != undefined) return;
     if (values['aef_name'] == '') return;
     var isDefaultValid = ValidateAttribute(values['aef_default'], values['aef_domain']);
-    if (!isDefaultValid[0]) values['aef_default'] = 0;
-
-    // Also check to see if that attribute already exists!
-    if (attributes[values['aef_name']] != undefined) return;
+    if (!isDefaultValid[0]) {
+        values['aef_default'] = 0;
+    }
+    else {
+        values['aef_default'] = isDefaultValid[1];
+    }
 
     AddAttribute(values['aef_name'], values['aef_desc'], values['aef_domain'], values['aef_default']);
     UpdateExistingCellAttributes(values['aef_name'], values['aef_default']);
     LoadAttributeListDisplay();
+    EmitTree(ReturnGraph());
 };
 
-// When modifying attributes, update all the existing cells to reflect the change
+// When adding attributes, update all the existing cells to reflect the change
 function UpdateExistingCellAttributes(attr_name, value) {
     var graph = ReturnGraph();
     TraverseTree(graph, function(vertex) {
@@ -427,12 +459,14 @@ function UpdateExistingCellAttributes(attr_name, value) {
     graph.refresh();
 };
 
-// A pair of sample attributes for testing
-AddAttribute('cost', '',
-    'POSITIVE_RATIONAL', 0);
+// A set of sample attributes for testing
+function AddAttributes() {
+    AddAttribute('cost', '',
+        'POSITIVE_RATIONAL', 0);
 
-AddAttribute('probability', '',
-    'UNIT_INTERVAL', 0);
+    AddAttribute('probability', '',
+        'UNIT_INTERVAL', 0);
 
-AddAttribute('possible', '',
-    'TRUE_FALSE', 1.0);
+    AddAttribute('possible', '',
+        'TRUE_FALSE', 1.0);
+};

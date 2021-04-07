@@ -124,7 +124,7 @@ function main(container) {
         graph.cellRenderer.getLabelValue = function (state) {
             if (!state.view.graph.getModel().isVertex(state.cell)) return;
             var result = state.cell.getAttribute('label');
-            result += '\n' + state.cell.getId();
+            //result += '\n' + state.cell.getId();
 
             for (var key in attributes) {
                 if (!attributes[key].display) continue;
@@ -357,6 +357,13 @@ function CreateContextMenu(graph, menu, cell, evt) {
 
     menu.addItem('Upload JSON (DEBUG)', 'resources/img/mxgraph_images/camera.png', function () {
         UploadGraphJSON(graph);
+    });
+
+    menu.addItem('Add test attributes (DEBUG)', 'resources/img/mxgraph_images/navigate_plus.png', function () {
+        AddAttributes();
+        graph.refresh();
+        EmitTree(graph);
+        LoadAttributeListDisplay(graph);
     });
 };
 

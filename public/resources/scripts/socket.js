@@ -47,6 +47,7 @@ function GetTreeData(graph) {
 function GetXMLNode(data) {
     var xmlnode = doc.createElement('cell');
     for (var key in data) {
+        if (data[key] == 'DELETED') continue;
         xmlnode.setAttribute(key, data[key]);
     }
     return xmlnode;
@@ -112,4 +113,5 @@ socket.on('tree_data', function (data) {
     //console.log(data);
     UpdateGraphAttributes(data.attributes);
     UpdateGraphCells(ReturnGraph(), data.cells);
+    LoadAttributeListDisplay(ReturnGraph());
 });
