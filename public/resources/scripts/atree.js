@@ -442,7 +442,7 @@ function TraverseTree(graph, vertex_function) {
 function EditAttribute(graph, cell, attributeName) {
     var attr = attributes[attributeName];
     var newValue = prompt("Enter new " + attributeName + " value for cell:", 0);
-    var validatedAttribute = ValidateAttribute(newValue, attr);
+    var validatedAttribute = ValidateAttribute(newValue, attr.domain);
     if (validatedAttribute[0] == false) {
         return;
     }

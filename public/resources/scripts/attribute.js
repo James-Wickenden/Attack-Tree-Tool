@@ -27,7 +27,8 @@ const domains = {
         OR_rule: function (current, child) {
             if (current == 1 || child == 1) return 1;
             return 0;
-        }
+        },
+        default_val: 1
     },
     UNIT_INTERVAL: {
         AND_rule: function (current, child) {
@@ -35,23 +36,28 @@ const domains = {
         },
         OR_rule: function (current, child) {
             return current + child - (current * child);
-        }
+        },
+        default_val: 0
     },
     RATIONAL: {
         AND_rule: AND_rule_realnumbers,
-        OR_rule: OR_rule_realnumbers
+        OR_rule: OR_rule_realnumbers,
+        default_val: 0
     },
     POSITIVE_RATIONAL: {
         AND_rule: AND_rule_realnumbers,
-        OR_rule: OR_rule_realnumbers
+        OR_rule: OR_rule_realnumbers,
+        default_val: 0
     },
     INTEGER: {
         AND_rule: AND_rule_realnumbers,
-        OR_rule: OR_rule_realnumbers
+        OR_rule: OR_rule_realnumbers,
+        default_val: 0
     },
     POSITIVE_INTEGER: {
         AND_rule: AND_rule_realnumbers,
-        OR_rule: OR_rule_realnumbers
+        OR_rule: OR_rule_realnumbers,
+        default_val: 0
     }
 };
 
@@ -82,9 +88,9 @@ function ShowHideAttribute(cb, graph) {
 // Returns a list containing two elements:
 // First, a boolean value whether the given attribute value is valid or not.
 // If this is true, the second element is the parsed and typed value to be used. This could be a boolean, a float, an int, etc.
-function ValidateAttribute(newValue, attribute) {
+function ValidateAttribute(newValue, domain) {
     if (newValue === null || newValue === undefined || newValue == '') return [false];
-    switch (attribute.domain) {
+    switch (domain) {
         case 'TRUE_FALSE':
             var newValue_UC = newValue.toUpperCase();
             if (newValue_UC == 'TRUE') return [true, 1];
@@ -137,7 +143,7 @@ function GetIndexFromAttributes() {
 function UpdateCellAttribute(graph, cell, attrInput) {
     var str_newValue = attrInput.value;
     var attr_key = attrInput.name.split('acf_')[1];
-    var validatedAttribute = ValidateAttribute(str_newValue, attributes[attr_key]);
+    var validatedAttribute = ValidateAttribute(str_newValue, attributes[attr_key].domain);
 
     if (validatedAttribute[0] == false) {
         return;
@@ -261,7 +267,7 @@ function LoadAttributeListDisplay(graph) {
     adl.appendChild(newAttribute_but);
 };
 
-// Called when a cell's attributes are to be updated via the cell;s attribute navigator form.
+// Called when a cell's attributes are to be updated via the cell's attribute navigator form.
 // Changed attributes must be validated, updated, and propagated.
 // Almost identical to the HandleFormSubmit() method in textual_view.js
 function HandleCellAttrSubmit(attributeForm, graph, cell, childCount) {
@@ -279,7 +285,7 @@ function HandleCellAttrSubmit(attributeForm, graph, cell, childCount) {
     // Each attribute should be checked to see if its valid for that attribute; ie within the attribute domain.
     for (var key in attributes) {
         var newValue = formAttributes['acf_' + key].value;
-        var validatedAttribute = ValidateAttribute(newValue, attributes[key]);
+        var validatedAttribute = ValidateAttribute(newValue, attributes[key].domain);
         if (validatedAttribute[0] == false) {
             continue;
         }
@@ -353,6 +359,7 @@ function SetUpAttributeEditor() {
     attr_default_lbl.innerHTML = 'Attribute default value: ';
     attr_default_txt.style.marginTop = '8px';
     attr_default_txt.name = 'aef_default';
+    attr_default_txt.placeholder = '0';
 
     aef.appendChild(attr_default_lbl);
     aef.appendChild(attr_default_txt);
@@ -366,7 +373,7 @@ function SetUpAttributeEditor() {
     aef_submit.style.marginTop = '6px';
     aef_submit.addEventListener('click', function(evt) {
         evt.preventDefault();
-        HandleAttributeEditorSubmit();
+        HandleAttributeEditorSubmit(aef);
         return false;
     });
     aef.appendChild(aef_submit);
@@ -383,9 +390,42 @@ function SetUpAttributeEditor() {
         return false;
     });
     aef.appendChild(aef_cancel);
-
 };
 
+// Called when an attribute is added or edited
+// New attributes must have their default values validated or set to the domain default
+// Cells in the graph must then be given that default value and a socket emission made.
+// Edited attributes must similarly be updated.
+function HandleAttributeEditorSubmit(aef) {
+    // First, build a dictionary for easy access to the form responses.
+    // Dictionary keys are the names given to the form elements as defined above.
+    var values = {};
+    for (var i = 0; i < aef.children.length; i++) {
+        var childName = aef.children[i].getAttribute('name');
+        if (childName != null) values[childName] = aef.children[i].value;
+    }
+    
+    // Some validation for non-empty names and invalid default values
+    if (values['aef_name'] == '') return;
+    var isDefaultValid = ValidateAttribute(values['aef_default'], values['aef_domain']);
+    if (!isDefaultValid[0]) values['aef_default'] = 0;
+
+    // Also check to see if that attribute already exists!
+    if (attributes[values['aef_name']] != undefined) return;
+
+    AddAttribute(values['aef_name'], values['aef_desc'], values['aef_domain'], values['aef_default']);
+    UpdateExistingCellAttributes(values['aef_name'], values['aef_default']);
+    LoadAttributeListDisplay();
+};
+
+// When modifying attributes, update all the existing cells to reflect the change
+function UpdateExistingCellAttributes(attr_name, value) {
+    var graph = ReturnGraph();
+    TraverseTree(graph, function(vertex) {
+        vertex.setAttribute(attr_name, value);
+    });
+    graph.refresh();
+};
 
 // A pair of sample attributes for testing
 AddAttribute('cost', '',
