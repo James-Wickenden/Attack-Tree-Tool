@@ -176,6 +176,7 @@ function DeleteSubtree_Textual(evt, graph) {
 // When editing, replace the list element with an interactive form to edit cell parameters.
 // The cell label, AND/OR typing, and each attribute can be edited.
 // Options should be hidden if not editable; for example, non-leaf attributes or AND/OR values for cells with <2 children.
+// Consider reformatting with https://stackoverflow.com/questions/9686538/align-labels-in-form-next-to-input
 function TurnListIntoEditableForm(li, cell, graph) {
     var li_HTML_old = li.innerHTML;
 

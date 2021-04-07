@@ -518,7 +518,7 @@ function OpenTab(evt, tabType) {
         tablinks[i].className = tablinks[i].className.replace(' active', '');
     }
 
-    document.getElementById(tabType).style.display = 'block';
+    document.getElementById(tabType).style.display = 'flex';
     evt.currentTarget.className += ' active';
 };
 

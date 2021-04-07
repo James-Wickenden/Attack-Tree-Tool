@@ -19,12 +19,14 @@ html, body {
     background-color: beige;
     border: 1px solid black;
     margin-right: 20px;
+    margin-bottom: 20px;
 }
 
 #tabContainer {
     flex: 2 0 auto;
     background-color: white;
     border: 1px solid black;
+    margin-bottom: 20px;
 }
 
 /* These elements handle displaying the right hand side tabs, the buttons, and their content */
@@ -52,10 +54,9 @@ html, body {
 }
 
 .tabcontent {
-    height: 100%;
     display: none;
+    flex-flow: column;
     padding: 6px 12px;
-    border: 1px solid #ccc;
     border-top: none;
 }
 
@@ -79,7 +80,8 @@ html, body {
 .attrContent {
     padding-bottom: 10px;
     border-bottom: 1px solid #888;
-    height: 25%;
+    flex-grow : 1;
+    display: block;
 }
 
 #attributeCellForm {

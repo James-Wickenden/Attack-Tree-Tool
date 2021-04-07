@@ -158,6 +158,14 @@ function SetUpClickedCellAttributeDisplay(graph, cell) {
 
     var attributeForm = document.createElement('form');
 
+    // Add a title for the form
+    var acf_title = document.createElement('h3');
+    acf_title.innerHTML = 'Cell Attribute Value Editor';
+    acf_title.style.marginBottom = '0px';
+    acf_title.style.fontFamily = 'Arial, Helvetica, sans-serif';
+    attributeForm.appendChild(acf_title);
+    attributeForm.appendChild(document.createElement("br"));
+
     // For each attribute, create a label and input pair of nodes to change them.
     var childCount = GetChildren(cell).length;
     for (var key in attributes) {
@@ -242,6 +250,15 @@ function LoadAttributeListDisplay(graph) {
         adl.appendChild(attr_lb);
         adl.appendChild(document.createElement("br"));
     }
+
+    var newAttribute_but = document.createElement('button');
+    newAttribute_but.innerHTML = 'New Attribute';
+    newAttribute_but.style.cursor = 'pointer';
+    newAttribute_but.onclick = function(evt) {
+        evt.preventDefault();
+        SetUpAttributeEditor();
+    };
+    adl.appendChild(newAttribute_but);
 };
 
 // Called when a cell's attributes are to be updated via the cell;s attribute navigator form.
@@ -274,6 +291,101 @@ function HandleCellAttrSubmit(attributeForm, graph, cell, childCount) {
 
     graph.refresh();
 };
+
+// Used to create new attributes, or edit existing ones.
+// Attributes have a name, a description, a domain, and a default value.
+// Domains contain rules for how they propagate up the tree.
+function SetUpAttributeEditor() {
+    var aef = document.getElementById('attribute_editor_form');
+    aef.innerHTML = '';
+
+    // Add a title for the form
+    var aef_title = document.createElement('h3');
+    aef_title.innerHTML = 'Attribute Editor';
+    aef_title.style.marginBottom = '0px';
+    aef.appendChild(aef_title);
+    aef.appendChild(document.createElement("br"));
+
+    // First, add the form element for the attribute name and its label
+    var attr_name_lbl = document.createElement('label');
+    var attr_name_txt = document.createElement('input');
+
+    attr_name_lbl.innerHTML = 'Attribute name: ';
+    attr_name_txt.name = 'aef_name';
+
+    aef.appendChild(attr_name_lbl);
+    aef.appendChild(attr_name_txt);
+    aef.appendChild(document.createElement("br"));
+
+    // For the attribute description:
+    var attr_desc_lbl = document.createElement('label');
+    var attr_desc_txt = document.createElement('textarea');
+
+    attr_desc_lbl.innerHTML = 'Attribute description: ';
+    attr_desc_txt.style.marginTop = '8px';
+    attr_desc_txt.name = 'aef_desc';
+
+    aef.appendChild(attr_desc_lbl);
+    aef.appendChild(attr_desc_txt);
+    aef.appendChild(document.createElement("br"));
+
+    // For the attribute domain:
+    var attr_domain_lbl = document.createElement('label');
+    var attr_domain_sel = document.createElement('select');
+
+    attr_domain_lbl.innerHTML = 'Attribute domain: ';
+    attr_domain_sel.style.marginTop = '8px';
+    attr_domain_sel.name = 'aef_domain';
+    for (var key in domains) {
+        var domainOption = document.createElement('option');
+        domainOption.text = key;
+        attr_domain_sel.add(domainOption);
+    }
+
+    aef.appendChild(attr_domain_lbl);
+    aef.appendChild(attr_domain_sel);
+    aef.appendChild(document.createElement("br"));
+
+    // For the attribute default value:
+    var attr_default_lbl = document.createElement('label');
+    var attr_default_txt = document.createElement('input');
+
+    attr_default_lbl.innerHTML = 'Attribute default value: ';
+    attr_default_txt.style.marginTop = '8px';
+    attr_default_txt.name = 'aef_default';
+
+    aef.appendChild(attr_default_lbl);
+    aef.appendChild(attr_default_txt);
+    aef.appendChild(document.createElement("br"));
+
+    // Add a submit and cancel button to navigate out of the form
+    var aef_submit = document.createElement('input');
+    aef_submit.setAttribute('type', 'submit');
+    aef_submit.setAttribute('value', 'Create Attribute');
+    aef_submit.style.cursor = 'pointer';
+    aef_submit.style.marginTop = '6px';
+    aef_submit.addEventListener('click', function(evt) {
+        evt.preventDefault();
+        HandleAttributeEditorSubmit();
+        return false;
+    });
+    aef.appendChild(aef_submit);
+
+    var aef_cancel = document.createElement('input');
+    aef_cancel.setAttribute('type', 'submit');
+    aef_cancel.setAttribute('value', 'Cancel');
+    aef_cancel.style.cursor = 'pointer';
+    aef_cancel.style.marginTop = '6px';
+    aef_cancel.style.marginLeft = '6px';
+    aef_cancel.addEventListener('click', function(evt) {
+        evt.preventDefault();
+        aef.innerHTML = '';
+        return false;
+    });
+    aef.appendChild(aef_cancel);
+
+};
+
 
 // A pair of sample attributes for testing
 AddAttribute('cost', '',
