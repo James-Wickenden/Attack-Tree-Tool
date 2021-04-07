@@ -125,24 +125,11 @@ function main(container) {
             if (!state.view.graph.getModel().isVertex(state.cell)) return;
             var result = state.cell.getAttribute('label');
             result += '\n' + state.cell.getId();
-            /*
-            if (cur_attribute_index == -1) {
-                for (var key in attributes) {
-                    var attr_val = GetReadableAttributeValue(key, state.cell.getAttribute(key));
-                    result += '\n' + key + ':' + attr_val;
-                }
-            }
-            else if (cur_attribute_index != -2) {
-                var attr_name = GetIndexFromAttributes()[cur_attribute_index];
-                var attr_val = GetReadableAttributeValue(attr_name, state.cell.getAttribute(attr_name));
-                result += '\n' + attr_name + ':' + attr_val;
-            }
-            */
 
             for (var key in attributes) {
                 if (!attributes[key].display) continue;
                 var attr_val = GetReadableAttributeValue(key, state.cell.getAttribute(key));
-                result += '\n' + key + ':' + attr_val;
+                result += '\n' + key + ': ' + attr_val;
             }
 
             return result;

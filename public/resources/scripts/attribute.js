@@ -55,8 +55,6 @@ const domains = {
     }
 };
 
-console.log(domains);
-
 // Adds a new attribute to the dictionary, its rules, and its domain.
 // rules should be functions of the form: function(current, child) { return [some new current value]; }
 // domains should be taken from the domains object, defined above.
@@ -66,8 +64,6 @@ function AddAttribute(attributeName, attributeDesc,
     const attr = {};
     attr.name = attributeName;
     attr.desc = attributeDesc;
-    //attr.AND_rule = AND_rule;
-    //attr.OR_rule = OR_rule;
     attr.domain = domain;
     attr.default_val = default_val;
     attr.display = true;
