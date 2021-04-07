@@ -11,6 +11,12 @@ var socket = io();
 
 // Parses the tree into a JS object and sends it via the socket to the server
 function EmitTree(graph) {
+    var tree_data = GetTreeData(graph);
+    socket.emit('tree_data', tree_data);
+};
+
+// Given a graph, parse it into a JSON object.
+function GetTreeData(graph) {
     var tree_data = {};
     var cells = [];
     TraverseTree(graph, function (vertex) {
@@ -32,7 +38,8 @@ function EmitTree(graph) {
         tree_data.attributes[key].AND_rule = attributes[key].AND_rule.toString();
         tree_data.attributes[key].OR_rule = attributes[key].OR_rule.toString();
     }
-    socket.emit('tree_data', tree_data);
+    
+    return tree_data;
 };
 
 // Iterates through the data dictionary built in the EmitTree function and defines and xmlnode and sets values accordingly.

@@ -362,12 +362,12 @@ function CreateContextMenu(graph, menu, cell, evt) {
         EmitTree(graph);
     });
 
-    menu.addItem('Download XML (DEBUG)', 'resources/img/mxgraph_images/export1.png', function () {
-        DownloadGraphXML(graph);
+    menu.addItem('Download JSON (DEBUG)', 'resources/img/mxgraph_images/export1.png', function () {
+        DownloadGraphJSON(graph);
     });
 
-    menu.addItem('Upload XML (DEBUG)', 'resources/img/mxgraph_images/camera.png', function () {
-        UploadGraphXML(graph);
+    menu.addItem('Upload JSON (DEBUG)', 'resources/img/mxgraph_images/camera.png', function () {
+        UploadGraphJSON(graph);
     });
 };
 
@@ -552,38 +552,32 @@ function SetUpToolbar() {
     */
 };
 
-// Given the graph, download the model as pretty XML.
-// This version does not support attribute encoding, another method may be required!
-function DownloadGraphXML(graph) {
-    var encoder = new mxCodec();
-    var enc_result = encoder.encode(graph.getModel());
-    var enc_xml = mxUtils.getPrettyXml(enc_result);
-    console.log(enc_xml);
-    //encoder.decode(enc_xml, graph.getModel());
-    DownloadToFile(enc_xml, 'attacktree.xml', 'text/xml');
+// Given the graph, download the model as pretty JSON.
+// This parses the tree and attributes with the same method used for socket.io emitting.
+function DownloadGraphJSON(graph) {
+    var tree_data = GetTreeData(graph);
+    DownloadToFile(JSON.stringify(tree_data, null, 2), 'attacktree.json', 'text/json');
 };
 
-// Request an XML file upload, parse it, and set the model.
-function UploadGraphXML(xml_str) {
-    var graph = ReturnGraph();
-    var xml_graph = mxUtils.parseXml(xml_str);
-    var codec = new mxCodec(xml_graph);
-    codec.decode(xml_graph.documentElement, graph.getModel());
-    // this is buggy and requires fixing!!
-    graph.refresh();
-
-    // after setting model, parse and load attributes!
+// Request a JSON file upload, parse it, and set the model.
+function UploadGraphJSON(json_str) {
+    var data = JSON.parse(json_str);
+    UpdateGraphAttributes(data.attributes);
+    UpdateGraphCells(ReturnGraph(), data.cells);
 };
 
-function ImportXML(event) {
+// Called when a file is uploaded
+// Attempts to parse the file and set the graph model and attributes to the file model.
+// TODO: validating and error handling?
+function ImportJSON(event) {
     event.preventDefault();
-    var xmlInput = document.getElementById('s_xml');
-    var file = xmlInput.files[0];
+    var jsonInput = document.getElementById('s_json');
+    var file = jsonInput.files[0];
     var reader = new FileReader();
     
     reader.onload = function (e) {
-        var xml_str = reader.result;
-        UploadGraphXML(xml_str);
+        var json_str = reader.result;
+        UploadGraphJSON(json_str);
     };
     reader.readAsText(file);
 };
