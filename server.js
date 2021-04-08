@@ -6,6 +6,22 @@ const path = require('path');
 const PORT = process.env.PORT || 5000;
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
+const redis = require("redis");
+
+const client = redis.createClient();
+
+client.on('error', function(error) {
+    console.log('redis encountered an error');
+    console.error(error);
+});
+client.on('connect', function() {
+    console.log('connected to redis');
+});
+
+client.get('user', function(err, value) {
+    if (err) throw err;
+    console.log(value);
+});
 
 setup_express();
 setup_socket_io();
