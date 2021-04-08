@@ -2,19 +2,20 @@
         This handles the tree builder socket connection for enabling live collaboration.
         On events, the tree is parsed and emitted as a JS object to the server, which sends it to other connected users.
         The receiving handler is also defined here.
+
+        Handlers for joining and creating groups and related logic is also here.
 */
 
 'use strict';
 
 // Starts a clienside socket connection
 var socket = io();
-//var socket = io({ autoConnect: false });
 
 // Parses the tree into a JS object and sends it via the socket to the server
 function EmitTree(graph) {
     var tree_data = GetTreeData(graph);
-    tree_data.key = '1234';
     tree_data.socket_id = socket.id;
+    tree_data.group_key = socket.group_key;
     socket.emit('tree_data', tree_data);
 };
 
@@ -43,6 +44,7 @@ function JoinGroup(event) {
     group_req.group_key = group_key;
     group_req.socket_id = socket.id;
     
+    console.log(group_req);
     socket.emit('join_group', group_req);
 };
 
@@ -124,25 +126,25 @@ function UpdateGraphAttributes(newAttributes) {
         if (key in newAttributes) newAttributes[key].display = attributes[key].display;
     }
     attributes = newAttributes;
-    /*
-    attributes = JSON.parse(JSON.stringify(newAttributes));
-    for (var key in attributes) {
-        attributes[key].AND_rule = new Function('return ' + attributes[key].AND_rule)();
-        attributes[key].OR_rule = new Function('return ' + attributes[key].OR_rule)();
-    }
-    */
 };
 
 // Catches messages from the server containing trees, and unpacks them
 socket.on('tree_data', function (data) {
-    //console.log(data);
     UpdateGraphAttributes(data.attributes);
     UpdateGraphCells(ReturnGraph(), data.cells);
     LoadAttributeListDisplay(ReturnGraph());
 });
 
-socket.on('PM', function (data) {
+socket.on('joined', function (data) {
     console.log(data);
-    console.log(socket.id);
+    if (data.OK != 'OK') return;
+    socket.group_key = data.group_key;
+    document.getElementById('curgroup_id').innerText = data.group_key;
 });
 
+socket.on('created', function (data) {
+    console.log(data);
+    if (data.OK != 'OK') return;
+    socket.group_key = data.group_key;
+    document.getElementById('curgroup_id').innerText = data.group_key;
+});
