@@ -8,10 +8,12 @@
 
 // Starts a clienside socket connection
 var socket = io();
+//var socket = io({ autoConnect: false });
 
 // Parses the tree into a JS object and sends it via the socket to the server
 function EmitTree(graph) {
     var tree_data = GetTreeData(graph);
+    tree_data.key = '1234';
     socket.emit('tree_data', tree_data);
 };
 

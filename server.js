@@ -18,11 +18,6 @@ client.on('connect', function() {
     console.log('connected to redis');
 });
 
-client.get('user', function(err, value) {
-    if (err) throw err;
-    console.log(value);
-});
-
 setup_express();
 setup_socket_io();
 
@@ -56,13 +51,59 @@ function setup_socket_io() {
         socket.on('disconnect', () => {
             console.log('user disconnected');
         });
-        socket.on('tree_data', (msg) => {
-            //console.log(msg);
-            io.emit('tree_data', msg);
+        socket.on('tree_data', (tree_data) => {
+            //console.log(tree_data);
+            UpdateRedis(tree_data);
+            //io.emit('tree_data', tree_data);
         });
         socket.on('chat message', (msg) => {
             console.log(msg);
             io.emit('chat message', msg);
         });
+        socket.on('join_group', (groupkey) => {
+            //console.log(groupkey);
+            JoinGroup(groupkey);
+        });
     });
+};
+
+// Returns a list of all the connected socket IDs.
+function GetSocketClientIDs() {
+    var client_ids = [];
+    io.sockets.sockets.forEach((socket,key)=>{
+        client_ids.push(socket.id);
+    });
+
+    return client_ids;
+};
+
+// Tries to join an existing group given a key
+function JoinGroup(groupkey) {
+    client.get(groupkey, function(err, value) {
+        if (err) throw err;
+    });
+};
+
+// Updates the redis value for that tree, and sends the updated tree to all the members in that group.
+function UpdateRedis(tree_data) {
+    var key = tree_data.key;
+    client.set(key, '{}');
+
+    client.get(key, function(err, value) {
+        if (err) throw err;
+        var redis_data = JSON.parse(value);
+        
+        redis_data.tree_data = tree_data;
+        redis_data.members = [ 'James' ];
+
+        console.log('setting the redis data to:');
+        console.log(JSON.stringify(redis_data));
+        client.set(key, JSON.stringify(redis_data));
+       
+        io.emit('tree_data', tree_data);
+
+        console.log('successfully updated and pushed change');
+    });
+
+    
 };

@@ -21,11 +21,18 @@
 <body onload="main(document.getElementById('graphContainer'));">
     <h1>Tree builder</h1>
 
-    <form id='jsonimport' onsubmit="ImportJSON(event)">
+    <form id='jsonimport' onsubmit='ImportJSON(event)'>
         <label id='lab_import_json'>Upload JSON graph:&#160;</label>
-        <input type="file" id="s_json"></input>
-        <input id="but_submit_json" type="submit" value="Submit"></input>
+        <input type='file' id='s_json'></input>
+        <input id='but_submit_json' type='submit' value='Submit'></input>
     </form>
+
+    <form id='joingroup' onsubmit='JoinGroup(event);'>
+        <label id='lab_join_group'>Join team:&#160;</label>
+        <input id='s_join' placeholder='Group key' value='1'></input>
+        <input id='but_submit_join' type='submit' value='Submit'></input>
+    </form>
+
     <br>
 
     <div id='mxflexContainer';>
