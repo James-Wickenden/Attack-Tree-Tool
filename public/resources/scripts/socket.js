@@ -13,6 +13,7 @@ var socket = io();
 
 // Parses the tree into a JS object and sends it via the socket to the server
 function EmitTree(graph) {
+    if (socket.group_key === undefined) return;
     var tree_data = GetTreeData(graph);
     tree_data.socket_id = socket.id;
     tree_data.group_key = socket.group_key;

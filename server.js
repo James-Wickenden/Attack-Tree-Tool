@@ -8,7 +8,11 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const redis = require("redis");
 
-const client = redis.createClient();
+const client = redis.createClient(process.env.REDIS_URL, {
+    tls: {
+        rejectUnauthorized: false
+    }
+});
 
 client.on('error', function(error) {
     console.log('redis encountered an error');
