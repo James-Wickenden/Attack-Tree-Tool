@@ -8,6 +8,7 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
 var groups = {};
+var clients = {};
 
 setup_express();
 setup_socket_io();
@@ -38,9 +39,10 @@ function setup_express() {
 // Sets up the socket.io events and handlers
 function setup_socket_io() {
     io.on('connection', (socket) => {
-        console.log('a user connected');
+        console.log('a user connected: ' + socket.id);
         socket.on('disconnect', () => {
-            console.log('user disconnected');
+            console.log('user disconnected: ' + socket.id);
+            RemoveUserFromGroup(socket.id);
         });
         socket.on('tree_data', (tree_data) => {
             console.log(tree_data);
@@ -62,7 +64,19 @@ function setup_socket_io() {
     });
 };
 
-/*
+// When a client disconnects, use their id to remove them from the group they were in,
+// and remove them from the clients dict
+// If they leave a group empty, delete it.
+function RemoveUserFromGroup(socket_id) {
+    var group_key = clients[socket_id];
+    if (group_key === undefined) return;
+    var members = groups[group_key].members;
+    members.splice(members.indexOf(socket_id), 1);
+
+    if (members.length == 0) delete groups[group_key];
+    delete clients[socket_id];
+};
+
 // Returns a list of all the connected socket IDs.
 function GetSocketClientIDs() {
     var client_ids = [];
@@ -72,7 +86,6 @@ function GetSocketClientIDs() {
 
     return client_ids;
 };
-*/
 
 // Tries to create a new group given a key
 function CreateGroup(group_req) {
@@ -81,34 +94,21 @@ function CreateGroup(group_req) {
     if (key === undefined) return;
     
     if (groups[key] === undefined) {
-        // Save a string JSON object to represent the group.
-        // This contains a list of member socket ids, and the tree object used in socket emissions
-        // This is the value with the corresponding redis key of the user-defined group key string
+        // Adds an object to the groups dictionary for the new group
+        // This contains a list of member socket ids, and the tree object used in socket emissions.
         var group_data = {};
         group_data.members = [socket_id];
         group_data.tree_data = group_req.tree_data;
 
         groups[key] = group_data;
-        //client.set(group_req.group_key, JSON.stringify(group_data));
+        clients[socket_id] = key;
+
         io.to(socket_id).emit('created', {OK: 'OK', group_key: key});
     }
     else {
         //console.log('Already a group with that key.');
         io.to(socket_id).emit('created', {OK: 'KEY_IN_USE', group_key: key});
     }
-
-    /*
-    client.get(group_req.group_key, function(err, value) {
-        if (err) throw err;
-        if (value === null) {
-            
-        }
-        else {
-            //console.log('Already a group with that key.');
-            io.to(group_req.socket_id).emit('created', {OK: 'KEY_IN_USE', group_key: group_req.group_key});
-        };
-    });
-    */
 };
 
 // Tries to join an existing group given a key
@@ -126,23 +126,11 @@ function JoinGroup(group_req) {
         // Then have the server send the tree to the new client
         var group_data = groups[key];
         group_data.members.push(socket_id);
+        clients[socket_id] = key;
 
-        //client.set(group_req.group_key, JSON.stringify(redis_data));
         io.to(socket_id).emit('tree_data', group_data.tree_data);
         io.to(socket_id).emit('joined', {OK: 'OK', group_key: key});
     }
-
-/*
-    client.get(group_req.group_key, function(err, value) {
-        if (err) throw err;
-        if (value === null) {
-            
-        }
-        else {
-            
-        }
-    });
-    */
 };
 
 // Updates the dictionary value for that tree, and sends the updated tree to all the members in that group.
@@ -159,25 +147,4 @@ function UpdateGroup(tree_data) {
         console.log('sending to ' + socket_id);
         io.to(socket_id).emit('tree_data', tree_data);
     }
-
-    /*
-    client.get(tree_data.group_key, function(err, value) {
-        if (err) throw err;
-        // First, parse the redis object for the group
-        var redis_data = JSON.parse(value);
-        // Then, update the redis group to have the new tree version
-        redis_data.tree_data = tree_data;
-        client.set(tree_data.group_key, JSON.stringify(redis_data));
-        console.log('setting the redis data to:');
-        console.log(JSON.stringify(redis_data));
-       
-        // Then, send the new tree to all the group members
-        for (var i in redis_data.members) {
-            var socket_id = redis_data.members[i];
-            console.log('sending to ' + socket_id);
-            io.to(socket_id).emit('tree_data', tree_data);
-        }
-    });
-
-    */
 };
