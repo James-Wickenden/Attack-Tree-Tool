@@ -66,7 +66,7 @@ const domains = {
 // domains should be taken from the domains object, defined above.
 function AddAttribute(attributeName, attributeDesc,
     domain, default_val) {
-
+    
     const attr = {};
     attr.name = attributeName;
     attr.desc = attributeDesc;
@@ -444,6 +444,7 @@ function HandleAttributeEditorSubmit(aef) {
         values['aef_default'] = isDefaultValid[1];
     }
 
+    if (values['aef_name'] == 'label' || values['aef_name'] == 'nodetype') return;
     AddAttribute(values['aef_name'], values['aef_desc'], values['aef_domain'], values['aef_default']);
     UpdateExistingCellAttributes(values['aef_name'], values['aef_default']);
     LoadAttributeListDisplay();
