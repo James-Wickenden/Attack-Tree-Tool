@@ -558,8 +558,10 @@ function DownloadGraphJSON(graph) {
 // Request a JSON file upload, parse it, and set the model.
 function UploadGraphJSON(json_str) {
     var data = JSON.parse(json_str);
+    var graph = ReturnGraph();
     UpdateGraphAttributes(data.attributes);
-    UpdateGraphCells(ReturnGraph(), data.cells);
+    UpdateGraphCells(graph, data.cells);
+    EmitTree(graph);
 };
 
 // Called when a file is uploaded

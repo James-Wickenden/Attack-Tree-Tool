@@ -31,7 +31,6 @@ function CreateGroup(event) {
     group_req.tree_data = tree_data;
     
     socket.emit('create_group', group_req);
-    console.log(group_req);
 };
 
 // Called when a group is joined
@@ -39,12 +38,12 @@ function CreateGroup(event) {
 function JoinGroup(event) {
     event.preventDefault();
     var group_req = {};
-    group_req.groupKey = document.getElementById('s_join').value;
+    var group_key = document.getElementById('s_join').value;
+    if (group_key == '') return;
+    group_req.group_key = group_key;
     group_req.socket_id = socket.id;
-    if (group_req.groupKey == '') return;
-
+    
     socket.emit('join_group', group_req);
-    console.log(group_req);
 };
 
 // Given a graph, parse it into a JSON object.
@@ -65,13 +64,7 @@ function GetTreeData(graph) {
         cells.push(cell);
     });
     tree_data.cells = cells;
-    tree_data.attributes = JSON.parse(JSON.stringify(attributes));
-    /*
-    for (var key in tree_data.attributes) {
-        tree_data.attributes[key].AND_rule = attributes[key].AND_rule.toString();
-        tree_data.attributes[key].OR_rule = attributes[key].OR_rule.toString();
-    }
-    */
+    tree_data.attributes = attributes;
     return tree_data;
 };
 
