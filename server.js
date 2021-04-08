@@ -85,7 +85,7 @@ function GetSocketClientIDs() {
 
 // Tries to create a new group given a key
 function CreateGroup(group_req) {
-    if (tree_data.group_key === undefined) return;
+    if (group_req.group_key === undefined) return;
     client.get(group_req.group_key, function(err, value) {
         if (err) throw err;
         if (value === null) {
@@ -107,7 +107,7 @@ function CreateGroup(group_req) {
 
 // Tries to join an existing group given a key
 function JoinGroup(group_req) {
-    if (tree_data.group_key === undefined) return;
+    if (group_req.group_key === undefined) return;
     client.get(group_req.group_key, function(err, value) {
         if (err) throw err;
         if (value === null) {
