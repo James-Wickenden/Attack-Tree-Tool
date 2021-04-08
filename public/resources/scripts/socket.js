@@ -14,7 +14,37 @@ var socket = io();
 function EmitTree(graph) {
     var tree_data = GetTreeData(graph);
     tree_data.key = '1234';
+    tree_data.socket_id = socket.id;
     socket.emit('tree_data', tree_data);
+};
+
+// Called when a group is created
+function CreateGroup(event) {
+    event.preventDefault();
+    var group_req = {};
+    var group_key = document.getElementById('s_create').value;
+    if (group_key == '') return;
+    var tree_data = GetTreeData(ReturnGraph());
+
+    group_req.group_key = group_key;
+    group_req.socket_id = socket.id;
+    group_req.tree_data = tree_data;
+    
+    socket.emit('create_group', group_req);
+    console.log(group_req);
+};
+
+// Called when a group is joined
+// Validates the key, then sends a request to join that group if it exists
+function JoinGroup(event) {
+    event.preventDefault();
+    var group_req = {};
+    group_req.groupKey = document.getElementById('s_join').value;
+    group_req.socket_id = socket.id;
+    if (group_req.groupKey == '') return;
+
+    socket.emit('join_group', group_req);
+    console.log(group_req);
 };
 
 // Given a graph, parse it into a JSON object.
@@ -117,3 +147,9 @@ socket.on('tree_data', function (data) {
     UpdateGraphCells(ReturnGraph(), data.cells);
     LoadAttributeListDisplay(ReturnGraph());
 });
+
+socket.on('PM', function (data) {
+    console.log(data);
+    console.log(socket.id);
+});
+

@@ -60,9 +60,13 @@ function setup_socket_io() {
             console.log(msg);
             io.emit('chat message', msg);
         });
-        socket.on('join_group', (groupkey) => {
-            //console.log(groupkey);
-            JoinGroup(groupkey);
+        socket.on('create_group', (group_req) => {
+            console.log(group_req);
+            CreateGroup(group_req);
+        });
+        socket.on('join_group', (group_req) => {
+            console.log(group_req);
+            JoinGroup(group_req);
         });
     });
 };
@@ -77,11 +81,33 @@ function GetSocketClientIDs() {
     return client_ids;
 };
 
+// Tries to create a new group given a key
+function CreateGroup(group_req) {
+    client.get(group_req.group_key, function(err, value) {
+        if (err) throw err;
+        if (value === null) {
+            var group_data = {};
+            group_data.members = [group_req.socket_id];
+            group_data.tree_data = group_req.tree_data;
+            console.log(group_data);
+            client.set(group_req.group_key, JSON.stringify(group_data));
+        }
+        else { console.log('Already a group with that key.'); };
+    });
+};
+
 // Tries to join an existing group given a key
-function JoinGroup(groupkey) {
-    client.get(groupkey, function(err, value) {
+function JoinGroup(group_req) {
+    client.get(group_req.group_key, function(err, value) {
         if (err) throw err;
     });
+
+    var socket_ids = GetSocketClientIDs();
+    console.log(socket_ids);
+    for (var id in socket_ids) {
+        
+        io.to(socket_ids[id]).emit('PM', 'hey :)');
+    }
 };
 
 // Updates the redis value for that tree, and sends the updated tree to all the members in that group.

@@ -27,8 +27,14 @@
         <input id='but_submit_json' type='submit' value='Submit'></input>
     </form>
 
+    <form id='creategroup' onsubmit='CreateGroup(event);'>
+        <label id='lab_create_group'>Create group:&#160;</label>
+        <input id='s_create' placeholder='Group key' value='1234'></input>
+        <input id='but_submit_create' type='submit' value='Submit'></input>
+    </form>
+
     <form id='joingroup' onsubmit='JoinGroup(event);'>
-        <label id='lab_join_group'>Join team:&#160;</label>
+        <label id='lab_join_group'>Join group:&#160;</label>
         <input id='s_join' placeholder='Group key' value='1'></input>
         <input id='but_submit_join' type='submit' value='Submit'></input>
     </form>

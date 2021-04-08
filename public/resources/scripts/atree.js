@@ -590,14 +590,3 @@ function DownloadToFile(content, filename, contentType) {
   
     URL.revokeObjectURL(a.href);
 };
-
-// Called when a group is joined
-// Validates the key, then sends a request to join that group if it exists
-function JoinGroup(event) {
-    event.preventDefault();
-    var groupKey = document.getElementById('s_join').value;
-    if (groupKey == '') return;
-
-    socket.emit('join_group', groupKey);
-    console.log(groupKey);
-};
