@@ -59,11 +59,11 @@ function setup_socket_io() {
         });
         socket.on('create_group', (group_req) => {
             //console.log(group_req);
-            CreateGroup(group_req);
+            CreateGroup(group_req, socket);
         });
         socket.on('join_group', (group_req) => {
             //console.log(group_req);
-            JoinGroup(group_req);
+            JoinGroup(group_req, socket);
         });
         socket.on('group_key_avl_req', (proposed_key) => {
             console.log(proposed_key);
@@ -101,9 +101,9 @@ function GetSocketClientIDs() {
 };
 
 // Tries to create a new group given a key
-function CreateGroup(group_req) {
+function CreateGroup(group_req, socket) {
     var key = group_req.group_key;
-    var socket_id = group_req.socket_id;
+    var socket_id = socket.id;
     if (key === undefined) return;
     
     if (groups[key] === undefined) {
@@ -125,9 +125,9 @@ function CreateGroup(group_req) {
 };
 
 // Tries to join an existing group given a key
-function JoinGroup(group_req) {
+function JoinGroup(group_req, socket) {
     var key = group_req.group_key;
-    var socket_id = group_req.socket_id;
+    var socket_id = socket.id;
     if (key === undefined) return;
 
     if (groups[key] === undefined) {

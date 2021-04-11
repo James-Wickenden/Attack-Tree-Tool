@@ -87,3 +87,12 @@ html, body {
 #attributeCellForm {
     font-family: 'Courier New', monospace;
 }
+
+.headerInfo {
+    display: inline;
+}
+
+#curgroup {
+    padding-left: 10px;
+    color: grey;
+}

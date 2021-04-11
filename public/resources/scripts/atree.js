@@ -162,6 +162,8 @@ function main(container) {
         ReturnGraph = function () { return graph; };
         LoadAttributeListDisplay(graph);
         document.getElementById('defaultTabView').click();
+        SetupSocket_Editor();
+        TryJoinCreateGroup();
 
         graph.refresh();
     }

@@ -7,46 +7,47 @@
 */
 
 'use strict';
+var socket;
 
-// Starts a clienside socket connection
-var socket = io();
+console.log(sessionStorage.getItem('editor_mode'));
+console.log(sessionStorage.getItem('group_key'));
 
 // Parses the tree into a JS object and sends it via the socket to the server
 function EmitTree(graph) {
-    if (sessionStorage.getItem('is_private') == 'true') return;
-    if (sessionStorage.getItem('group_key') === null) return;
+    if (sessionStorage.getItem('editor_mode') == 'private') return;
+    if (sessionStorage.getItem('group_key') === null) {
+        console.error('No group key in session storage.');
+        return;
+    };
     var tree_data = GetTreeData(graph);
     tree_data.socket_id = socket.id;
     tree_data.group_key = sessionStorage.getItem('group_key');
     socket.emit('tree_data', tree_data);
 };
 
-// Called when a group is created
-function CreateGroup(event) {
-    event.preventDefault();
-    var group_req = {};
-    var group_key = document.getElementById('s_create').value;
-    if (group_key == '') return;
-    var tree_data = GetTreeData(ReturnGraph());
+// Look at the session data, then join or create groups if needed.
+function TryJoinCreateGroup() {
+    var editor_mode = sessionStorage.getItem('editor_mode');
+    if (editor_mode == 'join_group') TryJoinGroup();
+    if (editor_mode == 'create_group') TryCreateGroup();
+};
 
-    group_req.group_key = group_key;
-    group_req.socket_id = socket.id;
-    group_req.tree_data = tree_data;
+// If a group is created when loading, create it
+// Done because socket ids change between the index page and this one.
+function TryCreateGroup() {
+    var group_req = {};
+    group_req.group_key = sessionStorage.getItem('group_key');
+    group_req.tree_data = GetTreeData(ReturnGraph());
     
     socket.emit('create_group', group_req);
 };
 
-// Called when a group is joined
-// Validates the key, then sends a request to join that group if it exists
-function JoinGroup(event) {
-    event.preventDefault();
+// If a group is joined when loading, join it
+// Done because socket ids change between the index page and this one.
+function TryJoinGroup() {
     var group_req = {};
-    var group_key = document.getElementById('s_join').value;
-    if (group_key == '') return;
-    group_req.group_key = group_key;
-    group_req.socket_id = socket.id;
+    group_req.group_key = sessionStorage.getItem('group_key');
     
-    console.log(group_req);
     socket.emit('join_group', group_req);
 };
 
@@ -130,23 +131,36 @@ function UpdateGraphAttributes(newAttributes) {
     attributes = newAttributes;
 };
 
-// Catches messages from the server containing trees, and unpacks them
-socket.on('tree_data', function (data) {
-    UpdateGraphAttributes(data.attributes);
-    UpdateGraphCells(ReturnGraph(), data.cells);
-    LoadAttributeListDisplay(ReturnGraph());
-});
+// Starts a clienside socket connection and sets up the handlers for receiving from the server
+function SetupSocket_Editor() {
+    socket = io();
 
-socket.on('joined', function (data) {
-    console.log(data);
-    if (data.OK != 'OK') return;
-    sessionStorage.setItem('group_key', data.group_key);
-    document.getElementById('curgroup_id').innerText = data.group_key;
-});
+    // Catches messages from the server containing trees, and unpacks them
+    socket.on('tree_data', function (data) {
+        UpdateGraphAttributes(data.attributes);
+        UpdateGraphCells(ReturnGraph(), data.cells);
+        LoadAttributeListDisplay(ReturnGraph());
+    });
 
-socket.on('created', function (data) {
-    console.log(data);
-    if (data.OK != 'OK') return;
-    sessionStorage.setItem('group_key', data.group_key);
-    document.getElementById('curgroup_id').innerText = data.group_key;
-});
+    socket.on('joined', function (data) {
+        console.log(data);
+        if (data.OK != 'OK') {
+            sessionStorage.removeItem('group_key');
+            console.error('Failed to join group.');
+        }
+        else {
+            document.getElementById('curgroup').innerText = 'Group code: ' + data.group_key;
+        }
+    });
+
+    socket.on('created', function (data) {
+        console.log(data);
+        if (data.OK != 'OK') {
+            sessionStorage.removeItem('group_key');
+            console.error('Failed to create group.');
+        }
+        else {
+            document.getElementById('curgroup').innerText = 'Group code: ' + data.group_key;
+        }
+    });
+};

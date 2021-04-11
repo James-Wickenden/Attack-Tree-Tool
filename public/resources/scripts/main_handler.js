@@ -2,8 +2,11 @@
 
 var socket;
 
-function SetUpMainLinks() {
-    SetUpSocket();
+// Sets up the index page, its links, and socket.
+function SetupIndex() {
+    sessionStorage.removeItem('editor_mode');
+    sessionStorage.removeItem('group_key');
+    SetUpSocket_Main();
     SetUpHoverHighlight();
 
     var private_editor = document.getElementById('main_private_editor');
@@ -18,7 +21,7 @@ function SetUpMainLinks() {
 // When an option is clicked, set up the session storage and reset css for highlighting.
 function LoadOption(evt, sender, mode) {
     evt.preventDefault();
-    sessionStorage.setItem('mode', mode);
+    sessionStorage.setItem('editor_mode', mode);
     sessionStorage.removeItem('group_key');
     OpenButton(sender);
 };
@@ -42,7 +45,7 @@ function OpenButton(sender) {
         // Private sessions can open straight away.
         // Group sessions must first have the key verified;
         // creating group only if that key is not in use, joining only if that group exists.
-        if (sessionStorage.getItem('mode') == 'private') {
+        if (sessionStorage.getItem('editor_mode') == 'private') {
             OpenEditor(true, null);
         }
         else {
@@ -52,7 +55,7 @@ function OpenButton(sender) {
 
     document.getElementById('main_group_status').innerText = '';
     var group_key_input = document.getElementById('main_group_key');
-    if (sessionStorage.getItem('mode') == 'private') {
+    if (sessionStorage.getItem('editor_mode') == 'private') {
         group_key_input.disabled = true;
     }
     else {
@@ -83,7 +86,7 @@ function SetUpHoverHighlight() {
 };
 
 // Sets up socket and its method for receiving messages from the server.
-function SetUpSocket() {
+function SetUpSocket_Main() {
     socket = io();
     socket.on('group_key_avl', function (data) {
         OpenEditor(false, data);
@@ -92,11 +95,12 @@ function SetUpSocket() {
 
 // Finally, open either a private session or a group session.
 function OpenEditor(private, data) {
+    console.log(sessionStorage.getItem('editor_mode'));
     if (private) {
         window.location.href = '/tree_builder';
     }
     else {
-        switch (sessionStorage.getItem('mode')) {
+        switch (sessionStorage.getItem('editor_mode')) {
             case 'join_group': 
                 if (data.OK == 'OK') {
                     document.getElementById('main_group_status').innerText = 'No such group with that code.';
