@@ -100,7 +100,7 @@ function UpdateGraphCells(graph, cells) {
     finally {
         graph.getModel().endUpdate();
     }
-
+    
     graph.refresh();
 };
 

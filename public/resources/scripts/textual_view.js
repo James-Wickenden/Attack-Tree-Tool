@@ -85,6 +85,17 @@ function Load_textual_graph(cells_list, graph) {
     var cellsWithOperationDivs = GetSelectedTextualCells(tcl);
     tcl.innerHTML = '';
 
+    if (sessionStorage.getItem('editor_mode') == 'private') {
+        var refreshButton = document.createElement('button');
+        refreshButton.innerHTML = 'Refresh Textual List';
+        refreshButton.style.cursor = 'pointer';
+        refreshButton.onclick = function(evt) {
+            evt.preventDefault();
+            Load_textual_graph(ParseTextually(graph), graph);
+        };
+        tcl.appendChild(refreshButton);
+    }
+
     // Iterates through the list of cells, creating list elements for each, and styling them
     for (var i = 0; i < cells_list.length / 2; i++) {
         var li = document.createElement('li');

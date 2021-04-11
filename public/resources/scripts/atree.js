@@ -53,7 +53,7 @@ function main(container) {
             document.getElementById('attributeCellForm').innerHTML = '';
             return defaultRefresh.apply(this, arguments);
         };
-
+        
         // Renders the label attribute on nodes
         // This is done as attack tree nodes are XML structures instead of simple mxcells
         graph.convertValueToString = function (cell) {
@@ -164,7 +164,7 @@ function main(container) {
         document.getElementById('defaultTabView').click();
         SetupSocket_Editor();
         TryJoinGroup();
-        
+
         graph.refresh();
     }
 };
