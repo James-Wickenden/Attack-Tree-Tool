@@ -9,9 +9,6 @@
 'use strict';
 var socket;
 
-console.log(sessionStorage.getItem('editor_mode'));
-console.log(sessionStorage.getItem('group_key'));
-
 // Parses the tree into a JS object and sends it via the socket to the server
 function EmitTree(graph) {
     if (sessionStorage.getItem('editor_mode') == 'private') return;
@@ -25,30 +22,14 @@ function EmitTree(graph) {
     socket.emit('tree_data', tree_data);
 };
 
-// Look at the session data, then join or create groups if needed.
-function TryJoinCreateGroup() {
-    var editor_mode = sessionStorage.getItem('editor_mode');
-    if (editor_mode == 'join_group') TryJoinGroup();
-    if (editor_mode == 'create_group') TryCreateGroup();
-};
-
-// If a group is created when loading, create it
-// Done because socket ids change between the index page and this one.
-function TryCreateGroup() {
-    var group_req = {};
-    group_req.group_key = sessionStorage.getItem('group_key');
-    group_req.tree_data = GetTreeData(ReturnGraph());
-    
-    socket.emit('create_group', group_req);
-};
-
 // If a group is joined when loading, join it
 // Done because socket ids change between the index page and this one.
 function TryJoinGroup() {
-    var group_req = {};
-    group_req.group_key = sessionStorage.getItem('group_key');
-    
-    socket.emit('join_group', group_req);
+    if (sessionStorage.getItem('editor_mode') == 'join_group') {
+        var group_req = {};
+        group_req.group_key = sessionStorage.getItem('group_key');
+        socket.emit('join_group', group_req);
+    }
 };
 
 // Given a graph, parse it into a JSON object.
@@ -137,6 +118,7 @@ function SetupSocket_Editor() {
 
     // Catches messages from the server containing trees, and unpacks them
     socket.on('tree_data', function (data) {
+        if (data.uninit === true) return;
         UpdateGraphAttributes(data.attributes);
         UpdateGraphCells(ReturnGraph(), data.cells);
         LoadAttributeListDisplay(ReturnGraph());
@@ -147,17 +129,6 @@ function SetupSocket_Editor() {
         if (data.OK != 'OK') {
             sessionStorage.removeItem('group_key');
             console.error('Failed to join group.');
-        }
-        else {
-            document.getElementById('curgroup').innerText = 'Group code: ' + data.group_key;
-        }
-    });
-
-    socket.on('created', function (data) {
-        console.log(data);
-        if (data.OK != 'OK') {
-            sessionStorage.removeItem('group_key');
-            console.error('Failed to create group.');
         }
         else {
             document.getElementById('curgroup').innerText = 'Group code: ' + data.group_key;

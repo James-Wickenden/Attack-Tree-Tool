@@ -163,7 +163,7 @@ function main(container) {
         LoadAttributeListDisplay(graph);
         document.getElementById('defaultTabView').click();
         SetupSocket_Editor();
-        TryJoinCreateGroup();
+        TryJoinGroup();
 
         graph.refresh();
     }

@@ -70,7 +70,7 @@ function RequestGroupAvailablility() {
         document.getElementById('main_group_status').innerText = 'Enter a group code, or start a private session.';
         return;
     }
-    socket.emit('group_key_avl_req', group_key);
+    socket.emit('group_key_avl_req', { proposed_key: group_key, joincreate: sessionStorage.getItem('editor_mode') });
 };
 
 // When hovering over the main buttons, they should be green
@@ -113,6 +113,7 @@ function OpenEditor(private, data) {
             case 'create_group':
                 if (data.OK == 'OK') {
                     sessionStorage.setItem('group_key', data.group_key);
+                    sessionStorage.setItem('editor_mode', 'join_group');
                     window.location.href = '/tree_builder';
                 }
                 else {

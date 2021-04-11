@@ -65,14 +65,21 @@ function setup_socket_io() {
             //console.log(group_req);
             JoinGroup(group_req, socket);
         });
-        socket.on('group_key_avl_req', (proposed_key) => {
-            console.log(proposed_key);
-            if (groups[proposed_key] === undefined) {
-                io.to(socket.id).emit('group_key_avl', {OK: 'OK', group_key: proposed_key});
-            }
-            else {
-                io.to(socket.id).emit('group_key_avl', {OK: 'KEY_IN_USE', group_key: proposed_key});
-            }
+        socket.on('group_key_avl_req', (group_req) => {
+            console.log(group_req);
+            switch (group_req.joincreate) {
+                case 'create_group':
+                    CreateGroup(group_req, socket);
+                    break;
+                case 'join_group':
+                    if (groups[group_req.proposed_key] === undefined) {
+                        io.to(socket.id).emit('group_key_avl', {OK: 'KEY_NOT_FOUND', group_key: group_req.proposed_key});
+                    }
+                    else {
+                        io.to(socket.id).emit('group_key_avl', {OK: 'OK', group_key: group_req.proposed_key});
+                    }
+                    break;
+            };
         });
     });
 };
@@ -86,7 +93,8 @@ function RemoveUserFromGroup(socket_id) {
     var members = groups[group_key].members;
     members.splice(members.indexOf(socket_id), 1);
 
-    if (members.length == 0) delete groups[group_key];
+    //if (members.length == 0) delete groups[group_key];
+    if (members.length == 0) console.log('Empty group with key ' + group_key);
     delete clients[socket_id];
 };
 
@@ -102,25 +110,25 @@ function GetSocketClientIDs() {
 
 // Tries to create a new group given a key
 function CreateGroup(group_req, socket) {
-    var key = group_req.group_key;
-    var socket_id = socket.id;
+    var key = group_req.proposed_key;
+    //var socket_id = socket.id;
     if (key === undefined) return;
     
     if (groups[key] === undefined) {
         // Adds an object to the groups dictionary for the new group
         // This contains a list of member socket ids, and the tree object used in socket emissions.
         var group_data = {};
-        group_data.members = [socket_id];
-        group_data.tree_data = group_req.tree_data;
+        group_data.members = [];
+        group_data.tree_data = { uninit: true };
 
         groups[key] = group_data;
-        clients[socket_id] = key;
-
-        io.to(socket_id).emit('created', {OK: 'OK', group_key: key});
+        //clients[socket_id] = key;
+        console.log(socket.id);
+        io.to(socket.id).emit('group_key_avl', {OK: 'OK', group_key: key});
     }
     else {
         //console.log('Already a group with that key.');
-        io.to(socket_id).emit('created', {OK: 'KEY_IN_USE', group_key: key});
+        io.to(socket.id).emit('group_key_avl', {OK: 'KEY_IN_USE', group_key: key});
     }
 };
 
