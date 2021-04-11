@@ -23,6 +23,7 @@ body {
     height: 200px;
     display: flex;
     flex-wrap: wrap;
+    padding-left: 10px;
 }
 
 .option_buttons {
@@ -53,6 +54,7 @@ body {
 
 #main_group_start {
     cursor: default;
+    padding-left: 0px;
 }
 
 #main_group_status {

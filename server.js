@@ -43,14 +43,14 @@ function setup_express() {
 // Sets up the socket.io events and handlers
 function setup_socket_io() {
     io.on('connection', (socket) => {
-        console.log('a user connected: ' + socket.id);
+        //console.log('a user connected: ' + socket.id);
         socket.on('disconnect', () => {
-            console.log('user disconnected: ' + socket.id);
+            //console.log('user disconnected: ' + socket.id);
             RemoveUserFromGroup(socket.id);
         });
         socket.on('tree_data', (tree_data) => {
-            console.log(tree_data);
-            UpdateGroup(tree_data);
+            //console.log(tree_data);
+            UpdateGroup(tree_data, socket);
             //io.emit('tree_data', tree_data);
         });
         socket.on('chat message', (msg) => {
@@ -66,7 +66,7 @@ function setup_socket_io() {
             JoinGroup(group_req, socket);
         });
         socket.on('group_key_avl_req', (group_req) => {
-            console.log(group_req);
+            //console.log(group_req);
             switch (group_req.joincreate) {
                 case 'create_group':
                     CreateGroup(group_req, socket);
@@ -80,6 +80,12 @@ function setup_socket_io() {
                     }
                     break;
             };
+        });
+        socket.on('server_dump', function() {
+            console.log('CLIENTS:');
+            console.log(clients);
+            console.log('GROUPS:');
+            console.log(groups);
         });
     });
 };

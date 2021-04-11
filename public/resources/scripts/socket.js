@@ -17,7 +17,6 @@ function EmitTree(graph) {
         return;
     };
     var tree_data = GetTreeData(graph);
-    tree_data.socket_id = socket.id;
     tree_data.group_key = sessionStorage.getItem('group_key');
     socket.emit('tree_data', tree_data);
 };
@@ -29,6 +28,9 @@ function TryJoinGroup() {
         var group_req = {};
         group_req.group_key = sessionStorage.getItem('group_key');
         socket.emit('join_group', group_req);
+    }
+    else {
+        document.getElementById('curgroup').innerText = 'Private Session';
     }
 };
 
@@ -117,21 +119,20 @@ function SetupSocket_Editor() {
     socket = io();
 
     // Catches messages from the server containing trees, and unpacks them
-    socket.on('tree_data', function (data) {
-        if (data.uninit === true) return;
-        UpdateGraphAttributes(data.attributes);
-        UpdateGraphCells(ReturnGraph(), data.cells);
+    socket.on('tree_data', function (tree_data) {
+        if (tree_data.uninit === true) return;
+        UpdateGraphAttributes(tree_data.attributes);
+        UpdateGraphCells(ReturnGraph(), tree_data.cells);
         LoadAttributeListDisplay(ReturnGraph());
     });
 
-    socket.on('joined', function (data) {
-        console.log(data);
-        if (data.OK != 'OK') {
+    socket.on('joined', function (response) {
+        if (response.OK != 'OK') {
             sessionStorage.removeItem('group_key');
             console.error('Failed to join group.');
         }
         else {
-            document.getElementById('curgroup').innerText = 'Group code: ' + data.group_key;
+            document.getElementById('curgroup').innerText = 'Group code: ' + response.group_key;
         }
     });
 };

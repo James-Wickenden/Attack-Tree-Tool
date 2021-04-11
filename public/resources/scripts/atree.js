@@ -164,7 +164,7 @@ function main(container) {
         document.getElementById('defaultTabView').click();
         SetupSocket_Editor();
         TryJoinGroup();
-
+        
         graph.refresh();
     }
 };
@@ -366,6 +366,10 @@ function CreateContextMenu(graph, menu, cell, evt) {
         graph.refresh();
         EmitTree(graph);
         LoadAttributeListDisplay(graph);
+    });
+
+    menu.addItem('Print server data (DEBUG)', 'resources/img/mxgraph_images/paste.png', function () {
+        socket.emit('server_dump', 'OK');
     });
 };
 

@@ -95,14 +95,13 @@ function SetUpSocket_Main() {
 
 // Finally, open either a private session or a group session.
 function OpenEditor(private, data) {
-    console.log(sessionStorage.getItem('editor_mode'));
     if (private) {
         window.location.href = '/tree_builder';
     }
     else {
         switch (sessionStorage.getItem('editor_mode')) {
             case 'join_group': 
-                if (data.OK == 'OK') {
+                if (data.OK == 'KEY_NOT_FOUND') {
                     document.getElementById('main_group_status').innerText = 'No such group with that code.';
                 }
                 else {
