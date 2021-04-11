@@ -25,6 +25,10 @@ function setup_express() {
             console.log("Loading main...");
             res.sendFile(path.join(__dirname, '/public/main.html'));
         })
+        .get('/main_old', (req, res) => {
+            console.log("Loading old main...");
+            res.sendFile(path.join(__dirname, '/public/main_old.html'));
+        })
         .get('/socketchat', (req, res) => {
             console.log("Loading socket.io test chat...");
             res.sendFile(path.join(__dirname, '/public/socketchat.html'));
@@ -60,6 +64,15 @@ function setup_socket_io() {
         socket.on('join_group', (group_req) => {
             //console.log(group_req);
             JoinGroup(group_req);
+        });
+        socket.on('group_key_avl_req', (proposed_key) => {
+            console.log(proposed_key);
+            if (groups[proposed_key] === undefined) {
+                io.to(socket.id).emit('group_key_avl', {OK: 'OK', group_key: proposed_key});
+            }
+            else {
+                io.to(socket.id).emit('group_key_avl', {OK: 'KEY_IN_USE', group_key: proposed_key});
+            }
         });
     });
 };

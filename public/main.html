@@ -1,19 +1,37 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-GB" xml:lang="en-GB">
+
 <head>
-  <meta charset="UTF-8"/>
-  <title>Attack Tree Node.js</title>
-  <style>
-    a {font-size:15pt;}
-    body {margin:25px;}
-  </style>
+    <meta charset="UTF-8" />
+    <title>Atree Home</title>
+
+    <link rel="stylesheet" type="text/css" href="resources/css/home_style.css" />
+    <script src="/socket.io/socket.io.js"></script>
+    <script type= "text/javascript" src='resources/scripts/main_handler.js'></script>
+    
 </head>
-<body>
-  <h1>Node.js using mxgraph to render Attack Trees</h1>
-  <h2>Currently handling a selection of demo/test pages:</h2>
-  <ul>
-    <li><a href='/tree_builder'>Attack tree builder</a></li>
-    <li><a href='/socketchat'>Socket.io chat</a></li>
-  </ul>
+
+<body onload='SetUpMainLinks();'>
+    <h1>Atree</h1>
+    <h2>An Attack Tree Designer and Editor</h2>
+
+    <div id='main_options'>
+        <div id='left_options'>
+            <input type='button' id='main_private_editor' value='Private Editor' class='option_buttons'>
+            <input type='button' id='main_create_group' value='Create Group' class='option_buttons'>
+            <input type='button' id='main_join_group' value='Join Group' class='option_buttons'>
+        </div>
+        <div id='right_options'>
+            <button>Start Editing!</button>
+        </div>
+    </div>
+    <ul>
+        <li><a href='/tree_builder'>Private Editor</a></li>
+        <li><a href='/tree_builder'>Create Group</a></li>
+        <li><a href='/tree_builder'>Join Group</a></li>
+    </ul>
+    <h2>About...</h2>
+    <p>About the Attack Tree Tool</p>
 </body>
+
 </html>

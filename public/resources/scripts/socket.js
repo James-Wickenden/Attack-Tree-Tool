@@ -13,10 +13,11 @@ var socket = io();
 
 // Parses the tree into a JS object and sends it via the socket to the server
 function EmitTree(graph) {
-    if (socket.group_key === undefined) return;
+    if (sessionStorage.getItem('is_private') == 'true') return;
+    if (sessionStorage.getItem('group_key') === null) return;
     var tree_data = GetTreeData(graph);
     tree_data.socket_id = socket.id;
-    tree_data.group_key = socket.group_key;
+    tree_data.group_key = sessionStorage.getItem('group_key');
     socket.emit('tree_data', tree_data);
 };
 
@@ -139,13 +140,13 @@ socket.on('tree_data', function (data) {
 socket.on('joined', function (data) {
     console.log(data);
     if (data.OK != 'OK') return;
-    socket.group_key = data.group_key;
+    sessionStorage.setItem('group_key', data.group_key);
     document.getElementById('curgroup_id').innerText = data.group_key;
 });
 
 socket.on('created', function (data) {
     console.log(data);
     if (data.OK != 'OK') return;
-    socket.group_key = data.group_key;
+    sessionStorage.setItem('group_key', data.group_key);
     document.getElementById('curgroup_id').innerText = data.group_key;
 });
