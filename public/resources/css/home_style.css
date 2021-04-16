@@ -40,7 +40,6 @@ body {
 }
 
 #main_group_key, #main_group_start {
-    align-self: center;
     width: 200px;
     height: 50px;
     outline: none;

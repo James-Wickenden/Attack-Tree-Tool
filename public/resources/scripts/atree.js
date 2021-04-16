@@ -549,3 +549,13 @@ function DownloadToFile(content, filename, contentType) {
   
     URL.revokeObjectURL(a.href);
 };
+
+// Navigate to the about page
+function GoToHelp() {
+    window.location.href = '/help';
+};
+
+// Navigate to the about page
+function GoToAbout() {
+    window.location.href = '/about';
+};

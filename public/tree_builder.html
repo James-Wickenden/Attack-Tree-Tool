@@ -21,33 +21,11 @@
 <body onload="main(document.getElementById('graphContainer'));">
     <div id='JSON_import' style='display:none;'>
         <form id='jsonimport' onsubmit='ImportJSON(event)'>
-            <label id='lab_import_json'>Upload JSON graph:&#160;</label>
             <input type='file' id='s_json'></input>
             <input id='but_submit_json' type='submit' value='Submit'></input>
         </form>
     </div>
     
-<!--
-    <h1>Tree builder</h1>
-
-    <form id='jsonimport' onsubmit='ImportJSON(event)'>
-        <label id='lab_import_json'>Upload JSON graph:&#160;</label>
-        <input type='file' id='s_json'></input>
-        <input id='but_submit_json' type='submit' value='Submit'></input>
-    </form>
-
-    <form id='creategroup' onsubmit='CreateGroup(event);'>
-        <label id='lab_create_group'>Create group:&#160;</label>
-        <input id='s_create' placeholder='Group key' value='1234'></input>
-        <input id='but_submit_create' type='submit' value='Submit'></input>
-    </form>
-
-    <form id='joingroup' onsubmit='JoinGroup(event);'>
-        <label id='lab_join_group'>Join group:&#160;</label>
-        <input id='s_join' placeholder='Group key' value='1'></input>
-        <input id='but_submit_join' type='submit' value='Submit'></input>
-    </form>
--->
     <h2 id='headerText' class='headerInfo'>Attack Tree Editor</h2>
     <h2 id='curgroup' class='headerInfo'></h2>
 
@@ -56,8 +34,8 @@
         <div id='dropdown_options' class='dropdown-content'>
             <a onclick='DownloadGraphJSON()'>Download tree</a>
             <a onclick='ImportJSON()'>Upload tree</a>
-            <a>Help</a>
-            <a>About</a>
+            <a onclick='GoToHelp()'>Help</a>
+            <a onclick='GoToAbout()'>About</a>
         </div>
     </div>
 

@@ -25,9 +25,13 @@ function setup_express() {
             console.log("Loading main...");
             res.sendFile(path.join(__dirname, '/public/main.html'));
         })
-        .get('/main_old', (req, res) => {
-            console.log("Loading old main...");
-            res.sendFile(path.join(__dirname, '/public/main_old.html'));
+        .get('/about', (req, res) => {
+            console.log("Loading about page...");
+            res.sendFile(path.join(__dirname, '/public/about.html'));
+        })
+        .get('/help', (req, res) => {
+            console.log("Loading help page...");
+            res.sendFile(path.join(__dirname, '/public/help.html'));
         })
         .get('/socketchat', (req, res) => {
             console.log("Loading socket.io test chat...");
