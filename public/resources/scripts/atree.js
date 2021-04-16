@@ -183,35 +183,6 @@ function GetReadableAttributeValue(attr_name, value) {
 // This is redefined above within the scope of var graph.
 function ReturnGraph() { return null; };
 
-// Adds a navigator to scroll through attributes.
-// TODO: add another fixed toolbar in another div with overarching functionality eg attribute control, XML/Yaml handling, File controls etc.
-function AddNavigator(container, graph) {
-    /*
-    var navigator_div = document.createElement('div');
-    var wnd;
-    navigator_div.style.padding = '4px';
-    var tb = new mxToolbar(navigator_div);
-    var box = container.getBoundingClientRect();
-    tb.addItem("Previous attribute", 'resources/img/arrow_left_40.png', function (evt) {
-        cur_attribute_index += -1;
-        if (cur_attribute_index < -2) cur_attribute_index = Object.keys(attributes).length - 1;
-        wnd.setTitle("Showing Attribute: " + GetIndexFromAttributes()[cur_attribute_index]);
-        graph.refresh();
-    });
-    tb.addItem("Next attribute", 'resources/img/arrow_right_40.png', function (evt) {
-        cur_attribute_index += 1;
-        if (cur_attribute_index >= Object.keys(attributes).length) cur_attribute_index = -2;
-        wnd.setTitle("Showing Attribute: " + GetIndexFromAttributes()[cur_attribute_index]);
-        graph.refresh();
-    });
-
-    wnd = new mxWindow('Attribute Navigator', navigator_div, box.left + 1, box.top + 1, 200, 66, true, false);
-    wnd.setScrollable(false);
-    wnd.setResizable(false);
-    wnd.setVisible(true);
-    */
-};
-
 // Adds buttons to a node with key node functions:
 // creating a new child from that node and deleting nodes and their subtree.
 function AddOverlays(graph, cell) {
@@ -278,18 +249,7 @@ function CreateContextMenu(graph, menu, cell, evt) {
                     DeleteSubtree(graph, cell);
                 });
             }
-            /*
-            // Edit attributes of the cell;
-            // will need to reference and edit the active attribute once attribute navigation is added.
-            if (GetChildren(cell).length == 0) {
-                menu.addItem('Edit cost', 'resources/img/mxgraph_images/copy.png', function () {
-                    EditAttribute(graph, cell, 'cost');
-                });
-                menu.addItem('Edit probability', 'resources/img/mxgraph_images/copy.png', function () {
-                    EditAttribute(graph, cell, 'probability');
-                });
-            }
-            */
+
             // Print the cell's children to the console. Used for debug.
             menu.addItem('Get Children (DEBUG)', 'resources/img/mxgraph_images/connector.gif', function () {
                 console.log(GetChildren(cell));
@@ -312,22 +272,6 @@ function CreateContextMenu(graph, menu, cell, evt) {
                     graph.refresh();
                 });
             }
-            /*
-            // Only show the option to propagate on leaf cells
-            // Propgate an attribute and its changes up the tree to the root, from the selected node.
-            // This is for debug purposes; propagation should happen automatically after each graph update:
-            // eg Adding or deleting nodes, editing attributes, toggling a node state...
-            if (GetChildren(cell).length == 0) {
-                menu.addItem('Propogate cost', 'resources/img/mxgraph_images/check.png', function () {
-                    PropagateChangeUpTree(graph, cell, attributes['cost']);
-                    graph.refresh();
-                });
-                menu.addItem('Propogate probability', 'resources/img/mxgraph_images/check.png', function () {
-                    PropagateChangeUpTree(graph, cell, attributes['probability']);
-                    graph.refresh();
-                });
-            }
-            */
             menu.addSeparator();
         }
     }
@@ -582,7 +526,6 @@ function ImportJSON() {
         };
         reader.readAsText(file);
     };
-    
 };
 
 // Take a JSON file upload, parse it, and set the model.
