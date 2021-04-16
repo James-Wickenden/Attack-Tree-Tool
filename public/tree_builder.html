@@ -19,6 +19,14 @@
 </head>
 
 <body onload="main(document.getElementById('graphContainer'));">
+    <div id='JSON_import' style='display:none;'>
+        <form id='jsonimport' onsubmit='ImportJSON(event)'>
+            <label id='lab_import_json'>Upload JSON graph:&#160;</label>
+            <input type='file' id='s_json'></input>
+            <input id='but_submit_json' type='submit' value='Submit'></input>
+        </form>
+    </div>
+    
 <!--
     <h1>Tree builder</h1>
 
@@ -42,6 +50,16 @@
 -->
     <h2 id='headerText' class='headerInfo'>Attack Tree Editor</h2>
     <h2 id='curgroup' class='headerInfo'></h2>
+
+    <div id='dropdownContainer'>
+        <button onclick='ToggleDropdown()' class='dropbtn'>Options</button>
+        <div id='dropdown_options' class='dropdown-content'>
+            <a onclick='DownloadGraphJSON()'>Download tree</a>
+            <a onclick='ImportJSON()'>Upload tree</a>
+            <a>Help</a>
+            <a>About</a>
+        </div>
+    </div>
 
     <div id='mxflexContainer';>
         <div id='graphContainer'>

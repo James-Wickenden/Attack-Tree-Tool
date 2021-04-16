@@ -535,55 +535,63 @@ function OpenTab(evt, tabType) {
     evt.currentTarget.className += ' active';
 };
 
-// Create the global toolbar and its links
-function SetUpToolbar() {
-    /*
-    needed:
-    file
-        new
-        export png via https://jgraph.github.io/mxgraph/docs/js-api/files/util/mxImageExport-js.html
-        load xml
-        save xml
-    information
-        help
-        about
-        preferences
-    groups:
-        create group
-        join group/leave group
-    */
+// Toggle the global toolbar and its links
+function ToggleDropdown() {
+    var dropdown_options = document.getElementById('dropdown_options');
+    dropdown_options.classList.toggle("show");
 };
+
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(event) {
+    if (!event.target.matches('.dropbtn')) {
+      var dropdowns = document.getElementsByClassName("dropdown-content");
+      var i;
+      for (i = 0; i < dropdowns.length; i++) {
+        var openDropdown = dropdowns[i];
+        if (openDropdown.classList.contains('show')) {
+          openDropdown.classList.remove('show');
+        }
+      }
+    }
+  }
 
 // Given the graph, download the model as pretty JSON.
 // This parses the tree and attributes with the same method used for socket.io emitting.
-function DownloadGraphJSON(graph) {
+function DownloadGraphJSON() {
+    var graph = ReturnGraph();
     var tree_data = GetTreeData(graph);
     DownloadToFile(JSON.stringify(tree_data, null, 2), 'attacktree.json', 'text/json');
 };
 
-// Request a JSON file upload, parse it, and set the model.
+// Called when a file is uploaded
+// Attempts to parse the file and set the graph model and attributes to the file model.
+// TODO: validating and error handling?
+function ImportJSON() {
+    var jsonInput = document.getElementById('s_json');
+    jsonInput.click();
+    jsonInput.onchange = function() {
+        var jsonInput = document.getElementById('s_json');
+        var file = jsonInput.files[0];
+        if (!file.name.split('.')[file.name.split('.').length-1] == 'json') return;
+
+        var reader = new FileReader();
+        
+        reader.onload = function (e) {
+            var json_str = reader.result;
+            UploadGraphJSON(json_str);
+        };
+        reader.readAsText(file);
+    };
+    
+};
+
+// Take a JSON file upload, parse it, and set the model.
 function UploadGraphJSON(json_str) {
     var data = JSON.parse(json_str);
     var graph = ReturnGraph();
     UpdateGraphAttributes(data.attributes);
     UpdateGraphCells(graph, data.cells);
     EmitTree(graph);
-};
-
-// Called when a file is uploaded
-// Attempts to parse the file and set the graph model and attributes to the file model.
-// TODO: validating and error handling?
-function ImportJSON(event) {
-    event.preventDefault();
-    var jsonInput = document.getElementById('s_json');
-    var file = jsonInput.files[0];
-    var reader = new FileReader();
-    
-    reader.onload = function (e) {
-        var json_str = reader.result;
-        UploadGraphJSON(json_str);
-    };
-    reader.readAsText(file);
 };
 
 // Simple function that allows for downloading files clientside.
