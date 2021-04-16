@@ -52,6 +52,10 @@ body {
     padding-left: 15px;
 }
 
+#main_group_key {
+    display: none;
+}
+
 #main_group_start {
     cursor: default;
     padding-left: 0px;

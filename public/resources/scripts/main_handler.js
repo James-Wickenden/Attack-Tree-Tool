@@ -37,6 +37,8 @@ function OpenButton(sender) {
     // Manages the start button css and handlers
     var start_button = document.getElementById('main_group_start');
     start_button.disabled = false;
+    start_button.style.backgroundColor = '#bbb';
+
     start_button.style.cursor = 'pointer';
     start_button.onmouseenter = function() { this.style.backgroundColor = 'green'; };
     start_button.onmouseleave = function() { this.style.backgroundColor = '#bbb'; };
@@ -56,10 +58,10 @@ function OpenButton(sender) {
     document.getElementById('main_group_status').innerText = '';
     var group_key_input = document.getElementById('main_group_key');
     if (sessionStorage.getItem('editor_mode') == 'private') {
-        group_key_input.disabled = true;
+        group_key_input.style.display = 'none';
     }
     else {
-        group_key_input.disabled = false;
+        group_key_input.style.display = 'block';
     }
 };
 
