@@ -35,6 +35,23 @@ function main(container) {
             if (cell.getId() != 'root') DeleteSubtree(graph, cell);
         });
 
+		// Set some stylesheet options for the visual appearance of vertices
+		var style = graph.getStylesheet().getDefaultVertexStyle();
+
+		style[mxConstants.STYLE_FONTCOLOR] = '#222222';
+		style[mxConstants.STYLE_FONTFAMILY] = 'sans-serif';
+		style[mxConstants.STYLE_FONTSIZE] = '15';
+		style[mxConstants.STYLE_FONTSTYLE] = '1';
+
+		style[mxConstants.STYLE_FILLCOLOR] = '#aadddd';
+		style[mxConstants.STYLE_SHADOW] = '1';
+		style[mxConstants.STYLE_ROUNDED] = '1';
+				
+		// Sets the default style for edges
+		style = graph.getStylesheet().getDefaultEdgeStyle();
+		style[mxConstants.STYLE_STROKEWIDTH] = 3;
+		style[mxConstants.STYLE_STROKECOLOR] = '#555555';
+
         // When editing a cell, ensures a minimum size for legibility
         // by overriding the getPreferredSizeForCell function
         var oldGetPreferredSizeForCell = graph.getPreferredSizeForCell;
