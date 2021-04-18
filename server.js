@@ -61,6 +61,10 @@ function setup_socket_io() {
             //console.log(msg);
             io.emit('chat message', msg);
         });
+        socket.on('tree_req', (msg) => {
+            //console.log('tree req');
+            ReturnRequestedTree(socket.id);
+        });
         socket.on('create_group', (group_req) => {
             //console.log(group_req);
             CreateGroup(group_req, socket);
@@ -178,4 +182,11 @@ function UpdateGroup(tree_data) {
         console.log('sending to ' + socket_id);
         io.to(socket_id).emit('tree_data', tree_data);
     }
+};
+
+// Called when a user requests to refresh their tree.
+// Pulls the group key from the client dictionary, and gets the corresponding group, then returns their tree.
+function ReturnRequestedTree(socket_id) {
+    var group = groups[clients[socket_id]];
+    io.to(socket_id).emit('tree_data', group.tree_data);
 };

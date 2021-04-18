@@ -1,4 +1,6 @@
-'use safe';
+/*
+    This script handles the main page and the logic of clicking on links, creating and joining groups, and loading into editors.
+*/
 
 var socket;
 
@@ -62,6 +64,7 @@ function OpenButton(sender) {
     }
     else {
         group_key_input.style.display = 'block';
+        
     }
 };
 

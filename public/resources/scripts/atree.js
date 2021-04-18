@@ -5,6 +5,7 @@
 
 var doc;
 
+// Main function call for setting up the mxgraph library and tree.
 function main(container) {
     // Checks if browser is supported, throws an error if not.
     if (!mxClient.isBrowserSupported()) {
@@ -558,4 +559,16 @@ function GoToHelp() {
 // Navigate to the about page
 function GoToAbout() {
     window.location.href = '/about';
+};
+
+// If in a group, request the tree again from the server and rebuild it.
+// If local, just refresh the tree.
+function RefreshTree() {
+    var graph = ReturnGraph();
+    if (sessionStorage.getItem('editor_mode') == 'private') {
+        graph.refresh();
+    }
+    else {
+        socket.emit('tree_req', 'REQUEST FOR TREE');
+    }
 };

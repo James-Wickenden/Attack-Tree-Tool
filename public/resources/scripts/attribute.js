@@ -1,5 +1,5 @@
 /*
-    This form handles creating new attributes and their params.
+    This script handles creating new attributes and their params.
     Attributes are JS objects that have a name, two rules for how they are combined, and a domain eg [0,1] or [0..].
     Also handles the attribute navigator, including creating and updating attributes, and creating these forms dyamically.
 */

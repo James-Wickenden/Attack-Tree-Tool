@@ -129,7 +129,8 @@ function SetupSocket_Editor() {
     socket.on('joined', function (response) {
         if (response.OK != 'OK') {
             sessionStorage.removeItem('group_key');
-            console.error('Failed to join group.');
+            sessionStorage.setItem('editor_mode', 'private');
+            console.error('Failed to join group. Going to private mode...');
         }
         else {
             document.getElementById('curgroup').innerText = 'Group code: ' + response.group_key;
