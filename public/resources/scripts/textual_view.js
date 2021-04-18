@@ -11,7 +11,6 @@ function ParseTextually(graph) {
     var root = graph.getModel().getCell('root');
     var graph_list = DepthFirst_ParseToTextual(root, '1.');
 
-    //console.log(graph_list);
     return graph_list;
 };
 

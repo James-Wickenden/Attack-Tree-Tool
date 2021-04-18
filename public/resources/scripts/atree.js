@@ -251,11 +251,6 @@ function CreateContextMenu(graph, menu, cell, evt) {
                 });
             }
 
-            // Print the cell's children to the console. Used for debug.
-            menu.addItem('Get Children (DEBUG)', 'resources/img/mxgraph_images/connector.gif', function () {
-                console.log(GetChildren(cell));
-            });
-
             // Toggle the node between AND and OR states
             if (GetChildren(cell).length > 1) {
                 var nodetype = cell.getAttribute('nodetype');
@@ -286,36 +281,11 @@ function CreateContextMenu(graph, menu, cell, evt) {
         graph.zoomOut();
     });
 
-    menu.addItem('Traverse (DEBUG)', 'resources/img/mxgraph_images/redo.png', function () {
-        TraverseTree(graph, function (vertex) { console.log(vertex); });
-    });
-
-    menu.addItem('List Attributes (DEBUG)', 'resources/img/mxgraph_images/key.png', function () {
-        console.log(attributes);
-    });
-
-    menu.addItem('Emit Tree (DEBUG)', 'resources/img/mxgraph_images/dot.gif', function () {
-        EmitTree(graph);
-    });
-
-    menu.addItem('Download JSON (DEBUG)', 'resources/img/mxgraph_images/export1.png', function () {
-        DownloadGraphJSON(graph);
-    });
-
-    menu.addItem('Upload JSON (DEBUG)', 'resources/img/mxgraph_images/camera.png', function () {
-        UploadGraphJSON(graph);
-    });
-
-    menu.addItem('Add test attributes (DEBUG)', 'resources/img/mxgraph_images/navigate_plus.png', function () {
-        AddAttributes();
-        graph.refresh();
-        EmitTree(graph);
-        LoadAttributeListDisplay(graph);
-    });
-
+    /*
     menu.addItem('Print server data (DEBUG)', 'resources/img/mxgraph_images/paste.png', function () {
         socket.emit('server_dump', 'OK');
     });
+    */
 };
 
 // Create a new leaf node with cell as its parent node
