@@ -294,11 +294,25 @@ function LoadAttributeListDisplay(graph) {
     var newAttribute_but = document.createElement('button');
     newAttribute_but.innerHTML = 'New Attribute';
     newAttribute_but.style.cursor = 'pointer';
+    newAttribute_but.style.marginTop = '10px';
     newAttribute_but.onclick = function(evt) {
         evt.preventDefault();
         SetUpAttributeEditor();
     };
+    
     adl.appendChild(newAttribute_but);
+    
+    if (sessionStorage.getItem('editor_mode') == 'private') {
+        var refreshButton = document.createElement('button');
+        refreshButton.innerHTML = 'Refresh Attribute List';
+        refreshButton.style.cursor = 'pointer';
+        refreshButton.style.marginLeft = '10px';
+        refreshButton.onclick = function(evt) {
+            evt.preventDefault();
+            LoadAttributeListDisplay(graph);
+        };
+        adl.appendChild(refreshButton);
+    }
 };
 
 // Called when a cell's attributes are to be updated via the cell's attribute navigator form.

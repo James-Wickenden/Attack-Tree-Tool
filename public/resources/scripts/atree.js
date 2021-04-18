@@ -554,6 +554,8 @@ function RefreshTree() {
     var graph = ReturnGraph();
     if (sessionStorage.getItem('editor_mode') == 'private') {
         graph.refresh();
+        LoadAttributeListDisplay(graph);
+        Load_textual_graph(ParseTextually(graph), graph);
     }
     else {
         socket.emit('tree_req', 'REQUEST FOR TREE');

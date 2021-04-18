@@ -15,18 +15,35 @@ html, body {
 
 /* The two main left/right divs and their flex styling. */
 #graphContainer {
-    flex: 3 0 0;
+    flex: 1;
     background-color: beige;
-    border: 1px solid black;
+    height: 90%;
+}
+
+#listContainer {
+    padding: 6px 12px;
+}
+
+#attrContainer {
+    flex: 2;
+    margin-left: 20px;
     margin-right: 20px;
-    margin-bottom: 20px;
+    background-color: white;
+    border: 1px solid black;
 }
 
 #tabContainer {
-    flex: 2 0 auto;
+    flex: 3;
     background-color: white;
     border: 1px solid black;
-    margin-bottom: 20px;
+    margin-right: 20px;
+}
+
+#attrHeader {
+    border-bottom: 1px solid black;
+    background-color: #f1f1f1;
+    display: block;
+    padding: 14px 16px;
 }
 
 /* These elements handle displaying the right hand side tabs, the buttons, and their content */
@@ -34,6 +51,7 @@ html, body {
     overflow: hidden;
     border: 1px solid #ccc;
     background-color: #f1f1f1;
+    border-bottom: 1px solid black;
 }
 
 .tabs button {
@@ -56,7 +74,6 @@ html, body {
 .tabcontent {
     display: none;
     flex-flow: column;
-    padding: 6px 12px;
     border-top: none;
 }
 
@@ -79,6 +96,7 @@ html, body {
 /* These elements handle displaying the attribute elements in the attribute navigator */
 .attrContent {
     padding-bottom: 10px;
+    padding-left: 20px;
     border-bottom: 1px solid #888;
     flex-grow : 1;
     display: block;
