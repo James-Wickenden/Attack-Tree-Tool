@@ -540,12 +540,14 @@ function DownloadToFile(content, filename, contentType) {
 
 // Navigate to the about page
 function GoToHelp() {
-    window.location.href = '/help';
+    //window.location.href = '/help';
+    window.open('/help');
 };
 
 // Navigate to the about page
 function GoToAbout() {
-    window.location.href = '/about';
+    //window.location.href = '/about';
+    window.open('/about');
 };
 
 // If in a group, request the tree again from the server and rebuild it.

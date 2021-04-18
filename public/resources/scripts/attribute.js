@@ -355,7 +355,7 @@ function SetUpAttributeEditor() {
 
     // Add a title for the form
     var aef_title = document.createElement('h3');
-    aef_title.innerHTML = 'Attribute Editor';
+    aef_title.innerHTML = 'Attribute Creator';
     aef_title.style.marginBottom = '0px';
     aef.appendChild(aef_title);
     aef.appendChild(document.createElement("br"));

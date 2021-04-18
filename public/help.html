@@ -4,7 +4,112 @@
     <link rel="stylesheet" type="text/css" href="resources/css/home_style.css" />
     <title>Atree Help</title>
   </head>
+  <style>
+      img {
+          border: 1px solid green;
+      }
+  </style>
   <body>
-      <h1>Help</h1>
+        <h1>Help</h1>
+
+        <h2>Loading into an editor</h2>
+      
+        <p>
+            To open an editor, select one of the three options on the left [shown below], then click the Start Editing button on the right.
+        </p>
+        <img src='resources/img/help/loading_editor.JPG'>
+
+        <p>
+            To create a group, choose a group code before clicking the start editing button.
+            If that code is free, you'll create a live group editing session that <strong>anyone with that code can join.</strong>
+        </p>
+
+        <p>
+            To join a group, enter the code of the group you want to join before clicking the start editing button.
+            If that code is valid, you'll join the live group editing session with equal editing access to all other members.
+        </p>
+
+        <h2>Using the editor</h2>
+
+        <p>
+            Once inside the editor, you can interact with two main windows.
+            The left window is for graph editors, and contains two different tabs for viewing and editing the graph in two different ways.
+        </p>
+        <p>
+            The right window is for the attribute editor, and allows you to add, remove, see, and edit attributes in the attack tree.
+        </p>
+
+        <h3>Left window</h3>
+
+        <div style='display: flex;'>
+            <img style='width: 800px;' src='resources/img/help/graph_Editor.JPG'>
+            <img style='width: 800px;' src='resources/img/help/list_editor.JPG'>
+        </div>
+
+        <p>
+            The <strong>Graph View</strong> tab renders a visual tree. You can drag the tree around, and click nodes to select them and view their attributes in the attribute editor.
+        </p>
+        <p>
+            You can right click nodes to add children to them, toggle them between AND and OR nodes, and delete them and their children, where valid.
+        </p>
+
+        <p>
+            The <strong>List View</strong> tab displays the tree in a list format. You can select nodes, and perform the same functions as by right clicking nodes in the graph view.
+            Editing this view also will update the graph view, and visa versa.
+        </p>
+
+
+        <h3>Right window</h3>
+
+        <img src='resources/img/help/attribute_editor.JPG'>
+
+        <p>
+            The <strong>Attribute Editor</strong> contains three different sub-menus: the <strong>Attribute List</strong>, the <strong>Attribute Creator</strong>, and the <strong>Cell Attribute Value Editor</strong>.
+        </p>
+        <br>
+
+        <p>
+            The <strong>Attribute List</strong> displays a list of all the attributes currently associated with that tree.
+            Each node in the tree will have an associated value for that attribute, which is calculated according to that attributes set of rules.
+            These rules are defined by that attributes domain.
+        </p>
+        <p>
+            You can click to toggle each one independently, which will change if its value is rendered for each node in your graph view.
+            You can also delete attributes with the delete button, which will ask for a prompt to confirm this action.
+            Finally, you can click New Attribute to open the attribute creator below.
+        </p>
+
+        <p>
+            The <strong>Attribute Creator</strong> is a form which creates new attributes. A description is not required, although if given one it will be shown when you hover over attributes in the attribute list.
+            The domain controls what values the attribute can take, and the AND/OR rules for combining its values up the tree.
+            The default value can only be one valid within that attributes domain.
+        </p>
+
+        <p>
+            The <strong>Cell Attribute Value Editor</strong> is a form which is context sensitive to the cell just clicked in the graph view.
+            Here, you can view that node's attribute values, and change them if that node is a leaf in the tree.
+        </p>
+
+        <h2>Live collaborative editing</h2>
+
+        <p>
+            If in a group, any changes you make to the tree will be broadcast to every member of your group, and they will have their trees updated with the changes you've just made to yours.
+            This may lead to some forms closing or refreshing.
+            At the top of the screen, your group code is displayed, or there will be a line showing that you're working in a private session.
+        </p>
+
+        <h2>Options</h2>
+
+        <img src='resources/img/help/options.JPG'>
+        <p>
+            The options dropdown shows a list of options you can perform.
+        </p>
+        <ul>
+            <li>The Refresh Tree option shouldn't be necessary for usage, but you can use it in a group to request a fresh version of the tree from the server, or in a private session to refresh the editors.</li>
+            <li>The Download Tree option saves a JSON file of the tree and its attributes to your computer.</li>
+            <li>The Upload Tree option prompts you for a JSON file in the same format as can be downloaded in the option above. When given, it will completely update the tree and its attributes to the new version, including sending it to your group members.</li>
+            <li>The help option brings you to this page.</li>
+            <li>The about option opens a page telling you about this project.</li>
+        </ul>
   </body>
 </html>
