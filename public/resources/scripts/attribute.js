@@ -279,7 +279,7 @@ function LoadAttributeListDisplay(graph) {
         if (attributes[key].desc != '') attr_lb.title = attributes[key].desc;
 
         attr_de.id = 'adl_de_' + key;
-        attr_de.innerHTML = '<img src="resources/img/mxgraph_images/delete2.png" />';
+        attr_de.innerHTML = '<img src="resources/img/delete.png" />';
         attr_de.style.cursor = 'pointer';
         attr_de.style.padding = '0px';
         attr_de.title = 'Delete attribute: ' + key;

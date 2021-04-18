@@ -190,7 +190,7 @@ function AddOverlays(graph, cell) {
     return; // Currently disabled to only use right-click context menu.
 
     // Draw the button to create a new child for that node
-    var overlay_addchild = new mxCellOverlay(new mxImage('resources/img/mxgraph_images/add.png', 24, 24), 'Add Child');
+    var overlay_addchild = new mxCellOverlay(new mxImage('resources/img/add.png', 24, 24), 'Add Child');
     overlay_addchild.cursor = 'hand';
     overlay_addchild.align = mxConstants.ALIGN_RIGHT;
     overlay_addchild.verticalAlign = mxConstants.ALIGN_BOTTOM;
@@ -203,7 +203,7 @@ function AddOverlays(graph, cell) {
     // Draw the button to delete that node
     // The root node must never be deleted, thus the extra case is needed.
     if (cell.getId() != 'root') {
-        var overlay_delete = new mxCellOverlay(new mxImage('resources/img/mxgraph_images/close.png', 30, 30), 'Delete');
+        var overlay_delete = new mxCellOverlay(new mxImage('resources/img/close.png', 30, 30), 'Delete');
         overlay_delete.cursor = 'hand';
         overlay_delete.offset = new mxPoint(-4, 8);
         overlay_delete.align = mxConstants.ALIGN_RIGHT;
@@ -239,14 +239,14 @@ function CreateContextMenu(graph, menu, cell, evt) {
     if (cell != null) {
         if (model.isVertex(cell)) {
             // Add a new leaf node as a child of that node
-            menu.addItem('Add child', 'resources/scripts/editors/images/overlays/check.png', function () {
+            menu.addItem('Add child', 'resources/img/add.png', function () {
                 AddChild(graph, cell);
             });
 
             // Delete the subtree with that node as its root
             // Cannot be called on the root node to prevent deleting the whole tree
             if (cell.id != 'root') {
-                menu.addItem('Delete', 'resources/scripts/editors/images/delete.gif', function () {
+                menu.addItem('Delete', 'resources/img/delete.png', function () {
                     DeleteSubtree(graph, cell);
                 });
             }
@@ -273,16 +273,16 @@ function CreateContextMenu(graph, menu, cell, evt) {
     }
 
     // Context: global
-    menu.addItem('Zoom in', 'resources/img/mxgraph_images/zoom_in.png', function () {
+    menu.addItem('Zoom in', 'resources/img/zoom_in.png', function () {
         graph.zoomIn();
     });
 
-    menu.addItem('Zoom out', 'resources/img/mxgraph_images/zoom_out.png', function () {
+    menu.addItem('Zoom out', 'resources/img/zoom_out.png', function () {
         graph.zoomOut();
     });
 
     /*
-    menu.addItem('Print server data (DEBUG)', 'resources/img/mxgraph_images/paste.png', function () {
+    menu.addItem('Print server data (DEBUG)', 'resources/img/printer.png', function () {
         socket.emit('server_dump', 'OK');
     });
     */
