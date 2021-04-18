@@ -80,7 +80,8 @@ function AddAttribute(attributeName, attributeDesc,
 
 // Deletes an attribute from the dictionary, and wipes the model's cells values for that attribute.
 // On rebuilding the graph, cells with a wiped attribute are not given it back.
-function DeleteAttribute(evt, graph, sender) {
+function DeleteAttribute(evt, sender) {
+    var graph = ReturnGraph();
     evt.preventDefault();
     var key = sender.id.split('adl_de_')[1];
     if (!confirm("Are you sure you want to delete the attribute '" + key + "'?")) return;
@@ -191,7 +192,9 @@ function SetUpClickedCellAttributeDisplay(graph, cell) {
 
     // For each attribute, create a label and input pair of nodes to change them.
     var childCount = GetChildren(cell).length;
+    var no_attr = 0;
     for (var key in attributes) {
+        no_attr++;
         var cellForm_Attr_lbl = document.createElement('label');
         var cellForm_Attr_txt = document.createElement('input');
 
@@ -221,19 +224,21 @@ function SetUpClickedCellAttributeDisplay(graph, cell) {
         attributeForm.appendChild(disableAttributeEditingMessage);
     }
     else {
-        // Add a submit and cancel button to navigate out of the form
-        // On clicking either, we must also restore the li onclick handler.
-        var cellForm_attr_sub = document.createElement('input');
-        cellForm_attr_sub.setAttribute('type', 'submit');
-        cellForm_attr_sub.setAttribute('value', 'Update Cell');
-        cellForm_attr_sub.style.cursor = 'pointer';
-        cellForm_attr_sub.style.marginTop = '6px';
-        cellForm_attr_sub.addEventListener('click', function (evt) {
-            evt.preventDefault();
-            HandleCellAttrSubmit(attributeForm, graph, cell, childCount);
-            return false;
-        });
-        attributeForm.appendChild(cellForm_attr_sub);
+        if (no_attr > 0) {
+            // Add a submit and cancel button to navigate out of the form
+            // On clicking either, we must also restore the li onclick handler.
+            var cellForm_attr_sub = document.createElement('input');
+            cellForm_attr_sub.setAttribute('type', 'submit');
+            cellForm_attr_sub.setAttribute('value', 'Update Cell');
+            cellForm_attr_sub.style.cursor = 'pointer';
+            cellForm_attr_sub.style.marginTop = '6px';
+            cellForm_attr_sub.addEventListener('click', function (evt) {
+                evt.preventDefault();
+                HandleCellAttrSubmit(attributeForm, graph, cell, childCount);
+                return false;
+            });
+            attributeForm.appendChild(cellForm_attr_sub);
+        }
 
         /*
         var cellForm_attr_ccl = document.createElement('input');
@@ -278,7 +283,7 @@ function LoadAttributeListDisplay(graph) {
         attr_de.style.cursor = 'pointer';
         attr_de.style.padding = '0px';
         attr_de.title = 'Delete attribute: ' + key;
-        attr_de.onclick = function(evt) { DeleteAttribute(evt, graph, this); };
+        attr_de.onclick = function(evt) { DeleteAttribute(evt, this); };
         
         adl.appendChild(attr_cb);
         adl.appendChild(attr_de);
