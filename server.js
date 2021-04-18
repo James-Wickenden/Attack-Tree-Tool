@@ -22,23 +22,15 @@ function setup_express() {
     app
         .use(express.static(path.join(__dirname, 'public')))
         .get('/', (req, res) => {
-            console.log("Loading main...");
             res.sendFile(path.join(__dirname, '/public/main.html'));
         })
         .get('/about', (req, res) => {
-            console.log("Loading about page...");
             res.sendFile(path.join(__dirname, '/public/about.html'));
         })
         .get('/help', (req, res) => {
-            console.log("Loading help page...");
             res.sendFile(path.join(__dirname, '/public/help.html'));
         })
-        .get('/socketchat', (req, res) => {
-            console.log("Loading socket.io test chat...");
-            res.sendFile(path.join(__dirname, '/public/socketchat.html'));
-        })
         .get('/tree_builder', (req, res) => {
-            console.log("Loading tree builder...");
             res.sendFile(path.join(__dirname, '/public/tree_builder.html'));
         });
     //.listen(PORT, () => console.log(`Listening on port ${ PORT }`));
@@ -47,34 +39,22 @@ function setup_express() {
 // Sets up the socket.io events and handlers
 function setup_socket_io() {
     io.on('connection', (socket) => {
-        //console.log('a user connected: ' + socket.id);
         socket.on('disconnect', () => {
-            //console.log('user disconnected: ' + socket.id);
             RemoveUserFromGroup(socket.id);
         });
         socket.on('tree_data', (tree_data) => {
-            //console.log(tree_data);
             UpdateGroup(tree_data, socket);
-            //io.emit('tree_data', tree_data);
-        });
-        socket.on('chat message', (msg) => {
-            //console.log(msg);
-            io.emit('chat message', msg);
         });
         socket.on('tree_req', (msg) => {
-            //console.log('tree req');
             ReturnRequestedTree(socket.id);
         });
         socket.on('create_group', (group_req) => {
-            //console.log(group_req);
             CreateGroup(group_req, socket);
         });
         socket.on('join_group', (group_req) => {
-            //console.log(group_req);
             JoinGroup(group_req, socket);
         });
         socket.on('group_key_avl_req', (group_req) => {
-            //console.log(group_req);
             switch (group_req.joincreate) {
                 case 'create_group':
                     CreateGroup(group_req, socket);
@@ -107,8 +87,8 @@ function RemoveUserFromGroup(socket_id) {
     var members = groups[group_key].members;
     members.splice(members.indexOf(socket_id), 1);
 
-    //if (members.length == 0) delete groups[group_key];
-    if (members.length == 0) console.log('Empty group with key ' + group_key);
+    // if the group is empty, delete it to free up the key.
+    if (members.length == 0) delete groups[group_key];
     delete clients[socket_id];
 };
 
@@ -125,7 +105,6 @@ function GetSocketClientIDs() {
 // Tries to create a new group given a key
 function CreateGroup(group_req, socket) {
     var key = group_req.proposed_key;
-    //var socket_id = socket.id;
     if (key === undefined) return;
     
     if (groups[key] === undefined) {
@@ -136,12 +115,9 @@ function CreateGroup(group_req, socket) {
         group_data.tree_data = { uninit: true };
 
         groups[key] = group_data;
-        //clients[socket_id] = key;
-        console.log(socket.id);
         io.to(socket.id).emit('group_key_avl', {OK: 'OK', group_key: key});
     }
     else {
-        //console.log('Already a group with that key.');
         io.to(socket.id).emit('group_key_avl', {OK: 'KEY_IN_USE', group_key: key});
     }
 };
@@ -153,7 +129,6 @@ function JoinGroup(group_req, socket) {
     if (key === undefined) return;
 
     if (groups[key] === undefined) {
-        //console.log('No group with that key.');
         io.to(socket_id).emit('joined', {OK: 'KEY_NOT_FOUND', group_key: key});
     }
     else {
@@ -179,7 +154,6 @@ function UpdateGroup(tree_data) {
     // Then, send the new tree to all the group members
     for (var i in groups[key].members) {
         var socket_id = groups[key].members[i];
-        console.log('sending to ' + socket_id);
         io.to(socket_id).emit('tree_data', tree_data);
     }
 };
