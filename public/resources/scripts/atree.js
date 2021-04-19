@@ -4,6 +4,7 @@
 */
 
 var doc;
+const USE_OVERLAYS = false;
 
 // Main function call for setting up the mxgraph library and tree.
 function main(container) {
@@ -41,7 +42,6 @@ function main(container) {
 		style[mxConstants.STYLE_FONTCOLOR] = '#222222';
 		style[mxConstants.STYLE_FONTFAMILY] = 'sans-serif';
 		style[mxConstants.STYLE_FONTSIZE] = '15';
-		style[mxConstants.STYLE_FONTSTYLE] = '1';
 
 		style[mxConstants.STYLE_FILLCOLOR] = '#aadddd';
 		style[mxConstants.STYLE_SHADOW] = '1';
@@ -204,7 +204,7 @@ function ReturnGraph() { return null; };
 // Adds buttons to a node with key node functions:
 // creating a new child from that node and deleting nodes and their subtree.
 function AddOverlays(graph, cell) {
-    return; // Currently disabled to only use right-click context menu.
+    if (!USE_OVERLAYS) return; // Currently disabled to only use right-click context menu.
 
     // Draw the button to create a new child for that node
     var overlay_addchild = new mxCellOverlay(new mxImage('resources/img/add.png', 24, 24), 'Add Child');
