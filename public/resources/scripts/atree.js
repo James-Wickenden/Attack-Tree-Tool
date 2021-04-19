@@ -61,7 +61,7 @@ function main(container) {
             var result = oldGetPreferredSizeForCell.apply(this, arguments);
             if (result != null) {
                 result.width = Math.max(140, result.width - 40);
-                result.height = Math.max(70, result.height - 40);
+                result.height = Math.max(GetPreferredCellHeight(), result.height - 40);
             }
             return result;
         };
@@ -71,6 +71,9 @@ function main(container) {
         graph.refresh = function () {
             Load_textual_graph(ParseTextually(graph), graph);
             document.getElementById('attributeCellForm').innerHTML = '';
+            TraverseTree(graph, function(vertex) {
+                graph.updateCellSize(vertex);
+            });
             return defaultRefresh.apply(this, arguments);
         };
         
@@ -170,7 +173,7 @@ function main(container) {
                 rootxml.setAttribute(attr.name, attr.default_val);
             }
 
-            var root = graph.insertVertex(parent, 'root', rootxml, w / 3, 20, 140, 70);
+            var root = graph.insertVertex(parent, 'root', rootxml, w, 20, 140, GetPreferredCellHeight());
             graph.updateCellSize(root);
             AddOverlays(graph, root);
         }
@@ -197,6 +200,12 @@ function GetReadableAttributeValue(attr_name, value) {
         attr_val = {0:'False', 1:'True'}[attr_val];
     }
     return attr_val.toString();
+};
+
+// A cell's height needs to be increased as more attributes are added.
+// Since cells are instantiated at several points, get their height from here.
+function GetPreferredCellHeight() {
+    return 70 + (Object.keys(attributes).length * 14);
 };
 
 // A function to return the graph for local functions to not require global variables.
@@ -342,6 +351,9 @@ function AddChild(graph, cell) {
     EmitTree(graph);
 };
 
+// Called when a user changes an AND node to an OR, or vice versa.
+// The cell must have all overlays removed, its nodetype updated, overlays re-added, and its attribute values recalculated and propagated up.
+// This is also an operation requiring a socket emission to the group.
 function Toggle_AND_OR(graph, cell, nodetype) {
     graph.removeCellOverlays(cell);
     var new_nodetype = { "AND": "OR", "OR": "AND" }[nodetype];
