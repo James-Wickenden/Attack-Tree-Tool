@@ -24,6 +24,9 @@ function setup_express() {
         .get('/', (req, res) => {
             res.sendFile(path.join(__dirname, '/public/main.html'));
         })
+        .get('/example_tree', (req, res) => {
+            res.sendFile(path.join(__dirname, '/public/resources/exampletree.json'));
+        })
         .get('/about', (req, res) => {
             res.sendFile(path.join(__dirname, '/public/about.html'));
         })

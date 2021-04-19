@@ -563,3 +563,20 @@ function RefreshTree() {
         socket.emit('tree_req', 'REQUEST FOR TREE');
     }
 };
+
+// Loads the example tree.
+function LoadExampleTree() {
+    const tree_req = new XMLHttpRequest();
+    tree_req.open("GET", '/example_tree');
+    tree_req.send();
+
+    tree_req.onreadystatechange = (e) => {
+        var json_str = tree_req.responseText;
+        var data = JSON.parse(json_str);
+        var graph = ReturnGraph();
+        UpdateGraphAttributes(data.attributes);
+        UpdateGraphCells(graph, data.cells);
+        EmitTree(graph);
+    };
+    
+};
