@@ -3,8 +3,10 @@
     Cell creation, deletion, editing, overlays, and the navigator are all defined in this form.
 */
 
+// Stores the nodes as doc elements to modify attributes as XML data.
 var doc;
-const USE_OVERLAYS = false;
+// Controls whether Add and Delete buttons should be shown as cell overlays.
+const USE_OVERLAYS = true;
 
 // Main function call for setting up the mxgraph library and tree.
 function main(container) {
@@ -204,7 +206,7 @@ function ReturnGraph() { return null; };
 // Adds buttons to a node with key node functions:
 // creating a new child from that node and deleting nodes and their subtree.
 function AddOverlays(graph, cell) {
-    if (!USE_OVERLAYS) return; // Currently disabled to only use right-click context menu.
+    if (!USE_OVERLAYS) return; // Overlays can be disabled with global flag.
 
     // Draw the button to create a new child for that node
     var overlay_addchild = new mxCellOverlay(new mxImage('resources/img/add.png', 24, 24), 'Add Child');
@@ -220,7 +222,7 @@ function AddOverlays(graph, cell) {
     // Draw the button to delete that node
     // The root node must never be deleted, thus the extra case is needed.
     if (cell.getId() != 'root') {
-        var overlay_delete = new mxCellOverlay(new mxImage('resources/img/close.png', 30, 30), 'Delete');
+        var overlay_delete = new mxCellOverlay(new mxImage('resources/img/close.png', 30, 30), 'Delete Subtree');
         overlay_delete.cursor = 'hand';
         overlay_delete.offset = new mxPoint(-4, 8);
         overlay_delete.align = mxConstants.ALIGN_RIGHT;
@@ -236,12 +238,16 @@ function AddOverlays(graph, cell) {
 // Draw the AND/OR indicator on non-leaf nodes
 function Add_AND_OR_Overlay(graph, cell) {
     graph.removeCellOverlays(cell);
-    var nodetype = cell.getAttribute('nodetype')
+    var nodetype = cell.getAttribute('nodetype');
     var img_src = 'resources/img/' + nodetype + '.png';
 
-    var overlay_andor = new mxCellOverlay(new mxImage(img_src, 24, 24), nodetype);
+    var overlay_andor = new mxCellOverlay(new mxImage(img_src, 24, 24), 'Toggle AND/OR');
     overlay_andor.align = mxConstants.ALIGN_CENTER;
     overlay_andor.verticalAlign = mxConstants.ALIGN_BOTTOM;
+    overlay_andor.cursor = 'hand';
+    overlay_andor.addListener(mxEvent.CLICK, mxUtils.bind(this, function (sender, evt) {
+        Toggle_AND_OR(graph, cell, nodetype);
+    }));
 
     graph.addCellOverlay(cell, overlay_andor);
     AddOverlays(graph, cell);
@@ -272,17 +278,7 @@ function CreateContextMenu(graph, menu, cell, evt) {
             if (GetChildren(cell).length > 1) {
                 var nodetype = cell.getAttribute('nodetype');
                 menu.addItem('Toggle AND/OR', 'resources/img/' + nodetype + '.png', function () {
-                    graph.removeCellOverlays(cell);
-                    var new_nodetype = { "AND": "OR", "OR": "AND" }[nodetype];
-                    cell.setAttribute('nodetype', new_nodetype);
-                    Add_AND_OR_Overlay(graph, cell);
-                    AddOverlays(graph, cell);
-                    for (var key in attributes) {
-                        PropagateChangeUpTree(graph, cell, attributes[key]);
-                    }
-
-                    EmitTree(graph);
-                    graph.refresh();
+                    Toggle_AND_OR(graph, cell, nodetype);
                 });
             }
             menu.addSeparator();
@@ -344,6 +340,20 @@ function AddChild(graph, cell) {
         graph.getModel().endUpdate();
     }
     EmitTree(graph);
+};
+
+function Toggle_AND_OR(graph, cell, nodetype) {
+    graph.removeCellOverlays(cell);
+    var new_nodetype = { "AND": "OR", "OR": "AND" }[nodetype];
+    cell.setAttribute('nodetype', new_nodetype);
+    Add_AND_OR_Overlay(graph, cell);
+    AddOverlays(graph, cell);
+    for (var key in attributes) {
+        PropagateChangeUpTree(graph, cell, attributes[key]);
+    }
+
+    EmitTree(graph);
+    graph.refresh();
 };
 
 // Delete the subtree with cell as its root
