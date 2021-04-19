@@ -386,7 +386,7 @@ function SetUpAttributeEditor() {
     // For the attribute domain:
     var attr_domain_lbl = document.createElement('label');
     var attr_domain_sel = document.createElement('select');
-
+    var attr_domain_rules = document.createElement('label');
     attr_domain_lbl.innerHTML = 'Attribute domain: ';
     attr_domain_sel.style.marginTop = '8px';
     attr_domain_sel.name = 'aef_domain';
@@ -395,9 +395,13 @@ function SetUpAttributeEditor() {
         domainOption.text = key;
         attr_domain_sel.add(domainOption);
     }
+    attr_domain_rules.innerHTML = 'Domain AND/OR rules can be found in the help page.';
+    attr_domain_rules.style.color = 'red';
 
     aef.appendChild(attr_domain_lbl);
     aef.appendChild(attr_domain_sel);
+    aef.appendChild(document.createElement("br"));
+    aef.appendChild(attr_domain_rules);
     aef.appendChild(document.createElement("br"));
 
     // For the attribute default value:
@@ -468,6 +472,8 @@ function HandleAttributeEditorSubmit(aef) {
     UpdateExistingCellAttributes(values['aef_name'], values['aef_default']);
     LoadAttributeListDisplay();
     EmitTree(ReturnGraph());
+
+    aef.innerHTML = '';
 };
 
 // When adding attributes, update all the existing cells to reflect the change

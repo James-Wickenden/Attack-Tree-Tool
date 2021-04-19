@@ -11,8 +11,13 @@
       h2 {
           color: #777;
       }
-      p, h3, img {
+      p, h3, img, li {
           margin-left: 2%;
+      }
+      h4 {
+          margin-bottom: 5px;
+          margin-top: 5px;
+          color: #555;
       }
   </style>
   <body>
@@ -90,6 +95,52 @@
             The domain controls what values the attribute can take, and the AND/OR rules for combining its values up the tree.
             The default value can only be one valid within that attributes domain.
         </p>
+
+        <h3>Domain Combination Rules</h3>
+        <ul>
+            <li>
+                <h4>TRUE_FALSE</h4>
+                <ul>
+                    <li>AND: x ∧ y</li>
+                    <li>OR: x ∨ y</li>
+                </ul>
+            </li>
+            <li>
+                <h4>UNIT_INTERVAL</h4>
+                <ul>
+                    <li>AND: x * y</li>
+                    <li>OR: x + y - (x * y)</li>
+                </ul>
+            </li>
+            <li>
+                <h4>RATIONAL</h4>
+                <ul>
+                    <li>AND: x + y</li>
+                    <li>OR: min(x,y)</li>
+                </ul>
+            </li>
+            <li>
+                <h4>POSITIVE_RATIONAL</h4>
+                <ul>
+                    <li>AND: x + y</li>
+                    <li>OR: min(x,y)</li>
+                </ul>
+            </li>
+            <li>
+                <h4>INTEGER</h4>
+                <ul>
+                    <li>AND: x + y</li>
+                    <li>OR: min(x,y)</li>
+                </ul>
+            </li>
+            <li>
+                <h4>POSITIVE_INTEGER</h4>
+                <ul>
+                    <li>AND: x + y</li>
+                    <li>OR: min(x,y)</li>
+                </ul>
+            </li>
+        </ul>
 
         <p>
             The <strong>Cell Attribute Value Editor</strong> is a form which is context sensitive to the cell just clicked in the graph view.
